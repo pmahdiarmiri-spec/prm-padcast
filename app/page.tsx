@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles } from "lucide-react";
+import Footer from "@/components/Footer";
 
 interface Episode {
   id: string;
@@ -382,90 +383,90 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative z-10 w-full max-w-7xl mx-auto mt-auto pt-6">
-        <AnimatePresence mode="wait">
-          {currentEpisode && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="glass-panel w-full rounded-2xl p-5 md:p-6"
-            >
-              <div className={`flex flex-col md:flex-row items-center justify-between gap-6 ${isRtl ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                <div className={`flex items-center gap-4 w-full md:w-auto ${isRtl ? "text-right" : "text-left"} ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
-                  <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center flex-shrink-0 overflow-hidden shadow-inner">
-                    <span className="font-mono text-[9px] font-black text-[#f59e0b] absolute top-1.5 left-1.5 bg-black/50 px-1.5 py-0.5 rounded">EP {currentEpisode.episodeNum}</span>
-                    <span className="text-white font-black text-xl md:text-2xl font-mono">{currentEpisode.episodeNum}</span>
+      <AnimatePresence mode="wait">
+        {currentEpisode && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="glass-panel w-full rounded-2xl p-5 md:p-6 mb-8"
+          >
+            <div className={`flex flex-col md:flex-row items-center justify-between gap-6 ${isRtl ? "md:flex-row" : "md:flex-row-reverse"}`}>
+              <div className={`flex items-center gap-4 w-full md:w-auto ${isRtl ? "text-right" : "text-left"} ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
+                <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center flex-shrink-0 overflow-hidden shadow-inner">
+                  <span className="font-mono text-[9px] font-black text-[#f59e0b] absolute top-1.5 left-1.5 bg-black/50 px-1.5 py-0.5 rounded">EP {currentEpisode.episodeNum}</span>
+                  <span className="text-white font-black text-xl md:text-2xl font-mono">{currentEpisode.episodeNum}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className={`flex items-center gap-2 ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] pulse-gold-dot" />
+                    <h4 className="text-sm md:text-base font-extrabold text-white line-clamp-1">
+                      {isRtl ? currentEpisode.titleFa : currentEpisode.titleEn}
+                    </h4>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <div className={`flex items-center gap-2 ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] pulse-gold-dot" />
-                      <h4 className="text-sm md:text-base font-extrabold text-white line-clamp-1">
-                        {isRtl ? currentEpisode.titleFa : currentEpisode.titleEn}
-                      </h4>
-                    </div>
-                    <p className="text-[11px] md:text-xs text-slate-400 line-clamp-1">
-                      {isRtl ? currentEpisode.descFa : currentEpisode.descEn}
-                    </p>
-                  </div>
+                  <p className="text-[11px] md:text-xs text-slate-400 line-clamp-1">
+                    {isRtl ? currentEpisode.descFa : currentEpisode.descEn}
+                  </p>
+                </div>
+              </div>
+
+              <div className={`flex items-center gap-4 w-full md:w-auto justify-between md:justify-end ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
+                <div className="hidden md:flex items-center gap-[4px] h-10 px-2">
+                  {Array.from({ length: 20 }).map((_, index) => {
+                    const heights = [14, 28, 12, 34, 18, 6, 22, 30, 10, 16];
+                    const h = heights[index % heights.length];
+                    return (
+                      <span 
+                        key={index} 
+                        className={`w-[3px] rounded-full bg-[#6366f1]/60 transition-all duration-300 ${isPlaying ? "wave-bar" : ""}`} 
+                        style={{ 
+                          height: `${h}px`,
+                          animationDelay: isPlaying ? `${index * 0.05}s` : "0s",
+                          animationPlayState: isPlaying ? "running" : "paused"
+                        }} 
+                      />
+                    );
+                  })}
                 </div>
 
-                <div className={`flex items-center gap-4 w-full md:w-auto justify-between md:justify-end ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
-                  <div className="hidden md:flex items-center gap-[4px] h-10 px-2">
-                    {Array.from({ length: 20 }).map((_, index) => {
-                      const heights = [14, 28, 12, 34, 18, 6, 22, 30, 10, 16];
-                      const h = heights[index % heights.length];
-                      return (
-                        <span 
-                          key={index} 
-                          className={`w-[3px] rounded-full bg-[#6366f1]/60 transition-all duration-300 ${isPlaying ? "wave-bar" : ""}`} 
-                          style={{ 
-                            height: `${h}px`,
-                            animationDelay: isPlaying ? `${index * 0.05}s` : "0s",
-                            animationPlayState: isPlaying ? "running" : "paused"
-                          }} 
-                        />
-                      );
-                    })}
-                  </div>
+                <div className="flex items-center gap-4 flex-1 md:flex-initial">
+                  <button 
+                    onClick={togglePlay}
+                    className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#6366f1] flex items-center justify-center hover:bg-[#6366f1]/90 transition duration-300 shadow-lg shadow-[#6366f1]/30 hover:shadow-xl hover:shadow-[#6366f1]/40 flex-shrink-0 active:scale-95"
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 text-white fill-white" />
+                    ) : (
+                      <Play className={`w-5 h-5 text-white fill-white ${isRtl ? "translate-x-[-1px]" : "translate-x-[1px]"}`} />
+                    )}
+                  </button>
 
-                  <div className="flex items-center gap-4 flex-1 md:flex-initial">
-                    <button 
-                      onClick={togglePlay}
-                      className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#6366f1] flex items-center justify-center hover:bg-[#6366f1]/90 transition duration-300 shadow-lg shadow-[#6366f1]/30 hover:shadow-xl hover:shadow-[#6366f1]/40 flex-shrink-0 active:scale-95"
+                  <div className="flex flex-col gap-1.5 flex-1 min-w-[120px] md:min-w-[150px]">
+                    <div className={`flex justify-between items-center ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
+                      <span className="font-mono text-[10px] text-slate-500">{formatTime(currentTime)}</span>
+                      <span className="font-mono text-[10px] text-slate-500">{currentEpisode.duration}</span>
+                    </div>
+                    <div 
+                      ref={progressBarRef}
+                      onClick={handleProgressClick}
+                      className="w-full bg-slate-800 h-[3px] rounded-full overflow-hidden cursor-pointer relative group"
                     >
-                      {isPlaying ? (
-                        <Pause className="w-5 h-5 text-white fill-white" />
-                      ) : (
-                        <Play className={`w-5 h-5 text-white fill-white ${isRtl ? "translate-x-[-1px]" : "translate-x-[1px]"}`} />
-                      )}
-                    </button>
-
-                    <div className="flex flex-col gap-1.5 flex-1 min-w-[120px] md:min-w-[150px]">
-                      <div className={`flex justify-between items-center ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
-                        <span className="font-mono text-[10px] text-slate-500">{formatTime(currentTime)}</span>
-                        <span className="font-mono text-[10px] text-slate-500">{currentEpisode.duration}</span>
-                      </div>
                       <div 
-                        ref={progressBarRef}
-                        onClick={handleProgressClick}
-                        className="w-full bg-slate-800 h-[3px] rounded-full overflow-hidden cursor-pointer relative group"
-                      >
-                        <div 
-                          className="bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full" 
-                          style={{  
-                            width: audioRef.current && audioRef.current.duration ? `${(currentTime / audioRef.current.duration) * 100}%` : "0%" 
-                          }} 
-                        />
-                      </div>
+                        className="bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full" 
+                        style={{  
+                          width: audioRef.current && audioRef.current.duration ? `${(currentTime / audioRef.current.duration) * 100}%` : "0%" 
+                        }} 
+                      />
                     </div>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </footer>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Footer lang={lang} />
     </main>
   );
 }

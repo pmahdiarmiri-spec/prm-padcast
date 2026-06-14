@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles } from "lucide-react";
 
@@ -16,6 +17,7 @@ interface Episode {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [lang, setLang] = useState<"fa" | "en">("fa");
   const [isPlaying, setIsPlaying] = useState(false);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -262,7 +264,8 @@ export default function Home() {
           {episodes.map((ep) => (
             <div 
               key={ep.id} 
-              className={`glass-card p-6 rounded-2xl flex flex-col justify-between gap-5 transition-all duration-300 ${
+              onClick={() => router.push(`/episode/${ep.episodeNum}`)}
+              className={`glass-card p-6 rounded-2xl flex flex-col justify-between gap-5 transition-all duration-300 cursor-pointer group ${
                 currentEpisode?.id === ep.id ? "border-[#6366f1]/50 bg-[#6366f1]/5" : ""
               }`}
             >
@@ -274,7 +277,7 @@ export default function Home() {
               </div>
 
               <div className={isRtl ? "text-right" : "text-left"}>
-                <h4 className="text-lg font-black text-white mb-2 line-clamp-1">
+                <h4 className="text-lg font-black text-white mb-2 line-clamp-1 group-hover:text-[#22d3ee] transition-colors">
                   {isRtl ? ep.titleFa : ep.titleEn}
                 </h4>
                 <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
@@ -283,7 +286,10 @@ export default function Home() {
               </div>
 
               <button 
-                onClick={() => selectEpisodeAndPlay(ep)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  selectEpisodeAndPlay(ep);
+                }}
                 className="w-full py-3 rounded-xl bg-white/5 hover:bg-[#6366f1] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95"
               >
                 {currentEpisode?.id === ep.id && isPlaying ? (

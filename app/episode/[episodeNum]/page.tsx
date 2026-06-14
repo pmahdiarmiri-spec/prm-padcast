@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import EpisodeClientPage from "./EpisodeClientPage";
 
 interface Props {
-  params: { episodeNum: string };
+  params: Promise<{ episodeNum: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
   const episode = await prisma.episode.findUnique({
-    where: { episodeNum: params.episodeNum },
+    where: { episodeNum: resolvedParams.episodeNum },
   });
 
   if (!episode) {
@@ -36,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EpisodePage({ params }: Props) {
+  const resolvedParams = await params;
   const episode = await prisma.episode.findUnique({
-    where: { episodeNum: params.episodeNum },
+    where: { episodeNum: resolvedParams.episodeNum },
   });
 
   if (!episode) {

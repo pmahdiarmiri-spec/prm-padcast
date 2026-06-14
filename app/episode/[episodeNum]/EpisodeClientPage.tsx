@@ -2,8 +2,9 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Play, Pause, ChevronLeft, ArrowRight, Share2, Sparkles, Volume2, Globe, Clock, Headphones } from "lucide-react";
+import { Play, Pause, ArrowRight, Share2, Clock, Headphones, RotateCcw, RotateCw } from "lucide-react";
 import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
 
 interface Episode {
   id: string;
@@ -53,6 +54,18 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
     const newTime = percentage * audioRef.current.duration;
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
+  };
+
+  const skipForward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + 10);
+    }
+  };
+
+  const skipBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+    }
   };
 
   const formatTime = (time: number) => {
@@ -175,26 +188,44 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
           transition={{ delay: 0.2 }}
           className="glass-panel w-full rounded-2xl p-5"
         >
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <span className="font-mono text-xs text-slate-500">{formatTime(currentTime)}</span>
-              <div className="flex items-center gap-[4px] h-4">
-                {Array.from({ length: 15 }).map((_, index) => {
-                  const heights = [8, 16, 10, 20, 12, 6, 14, 18, 8, 12];
-                  const h = heights[index % heights.length];
-                  return (
-                    <span 
-                      key={index} 
-                      className={`w-[2.5px] rounded-full bg-[#6366f1]/60 transition-all duration-300 ${isPlaying ? "wave-bar" : ""}`} 
-                      style={{ 
-                        height: `${h}px`,
-                        animationDelay: isPlaying ? `${index * 0.05}s` : "0s",
-                        animationPlayState: isPlaying ? "running" : "paused"
-                      }} 
-                    />
-                  );
-                })}
+              
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={skipBackward} 
+                  className="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                  title="10 Seconds Back"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+                <div className="flex items-center gap-[4px] h-4">
+                  {Array.from({ length: 15 }).map((_, index) => {
+                    const heights = [8, 16, 10, 20, 12, 6, 14, 18, 8, 12];
+                    const h = heights[index % heights.length];
+                    return (
+                      <span 
+                        key={index} 
+                        className={`w-[2.5px] rounded-full bg-[#6366f1]/60 transition-all duration-300 ${isPlaying ? "wave-bar" : ""}`} 
+                        style={{ 
+                          height: `${h}px`,
+                          animationDelay: isPlaying ? `${index * 0.05}s` : "0s",
+                          animationPlayState: isPlaying ? "running" : "paused"
+                        }} 
+                      />
+                    );
+                  })}
+                </div>
+                <button 
+                  onClick={skipForward} 
+                  className="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                  title="10 Seconds Forward"
+                >
+                  <RotateCw className="w-4 h-4" />
+                </button>
               </div>
+
               <span className="font-mono text-xs text-slate-500">{episode.duration}</span>
             </div>
             <div 
@@ -212,6 +243,8 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
           </div>
         </motion.div>
       </section>
+
+      <Footer lang={lang} />
     </main>
   );
 }

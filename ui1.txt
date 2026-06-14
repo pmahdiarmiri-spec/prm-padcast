@@ -1,0 +1,1129 @@
+global:"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .font-vazirmatn {
+    font-family: var(--font-vazirmatn), sans-serif;
+  }
+
+  .font-inter {
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-width: 320px;
+    background: var(--bg-primary);
+    scroll-behavior: smooth;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100dvh;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(99, 102, 241, 0.16), transparent 34rem),
+      radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.08), transparent 28rem),
+      var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.35);
+    color: #ffffff;
+  }
+}
+
+:root {
+  --bg-primary: #030712;
+  --bg-surface: #0b0f19;
+  --bg-card: #111827;
+  --color-indigo: #6366f1;
+  --color-violet: #a78bfa;
+  --color-gold: #f59e0b;
+  --color-cyan: #22d3ee;
+  --text-primary: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-subtle: #4b5563;
+}
+
+.noise-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.018;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.grid-dot-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    radial-gradient(rgba(99, 102, 241, 0.14) 1.2px, transparent 1.2px);
+  background-size: 72px 72px, 72px 72px, 24px 24px;
+  opacity: 0.82;
+  mask-image: radial-gradient(circle at 50% 0%, black, transparent 78%);
+}
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(11, 15, 25, 0.78), rgba(11, 15, 25, 0.52));
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  box-shadow:
+    0 18px 70px -26px rgba(0, 0, 0, 0.78),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 18px 50px -28px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(34, 211, 238, 0.035));
+  border-color: rgba(34, 211, 238, 0.16);
+  box-shadow:
+    0 24px 70px -30px rgba(34, 211, 238, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  transform: translateY(-2px);
+}
+
+.hero-hologram {
+  transform-style: preserve-3d;
+}
+
+.hero-hologram::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.12) 18%, transparent 34%);
+  transform: translateX(-120%);
+  animation: hologram-sheen 7s infinite;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+  animation: marquee 18s linear infinite;
+}
+
+.footer-3d {
+  transform-style: preserve-3d;
+}
+
+.footer-3d::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 1.65rem;
+  pointer-events: none;
+  transform: translateZ(-24px);
+  filter: blur(0.2px);
+}
+
+.footer-grid-bg {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(circle at 50% 50%, black, transparent 72%);
+}
+
+.footer-orbit {
+  animation: orbit-glow 5s ease-in-out infinite;
+}
+
+.footer-wave {
+  animation: footer-wave 1.45s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.player-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.player-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(99, 102, 241, 0.18), transparent 28%),
+    radial-gradient(circle at 90% 20%, rgba(34, 211, 238, 0.13), transparent 26%);
+}
+
+.social-glow:hover {
+  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 34px rgba(34, 211, 238, 0.14);
+}
+
+@keyframes hologram-sheen {
+  0% {
+    transform: translateX(-140%);
+  }
+
+  42%,
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+@keyframes pulse-gold {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.4;
+  }
+}
+
+.pulse-gold-dot {
+  animation: pulse-gold 2s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.wave-bar {
+  animation: wave 1s infinite ease-in-out;
+  transform-origin: bottom;
+  will-change: transform, opacity;
+}
+
+@keyframes footer-wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+    opacity: 0.42;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes orbit-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 38px rgba(34, 211, 238, 0.08);
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 70px rgba(99, 102, 241, 0.18);
+    transform: rotate(4deg) scale(1.035);
+  }
+}
+
+@media (max-width: 420px) {
+  .glass-panel {
+    border-radius: 1.35rem;
+  }
+
+  .marquee-track {
+    animation-duration: 14s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+"
+========================================================================================================
+page.tsx:"
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowUpRight,
+  Code2,
+  Cpu,
+  Database,
+  Globe,
+  Headphones,
+  Mail,
+  Pause,
+  Play,
+  Radio,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Volume2,
+  Zap,
+} from "lucide-react";
+
+interface Episode {
+  id: string;
+  titleFa: string;
+  titleEn: string;
+  descFa: string;
+  descEn: string;
+  audioUrl: string;
+  duration: string;
+  episodeNum: string;
+}
+
+type Lang = "fa" | "en";
+
+const marqueeItems = [
+  "AI-POWERED",
+  "GLOBAL TRADE",
+  "DEVOPS",
+  "ATRIANA",
+  "SPEECH SYNTHESIS",
+  "SYSTEM ARCHITECTURE",
+  "BI ENGINES",
+  "REALTIME TRANSLATION",
+];
+
+const visualizerHeights = [18, 34, 14, 42, 24, 12, 30, 48, 16, 26, 38, 20, 44, 28, 10, 36, 22, 46, 18, 32, 12, 40];
+
+export default function Home() {
+  const [lang, setLang] = useState<Lang>("fa");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressBarRef = useRef<HTMLDivElement | null>(null);
+
+  const isRtl = lang === "fa";
+  const progress = duration > 0 ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const showEmailError = emailTouched && email.length > 0 && !isEmailValid;
+  const showEmailSuccess = emailTouched && email.length > 0 && isEmailValid;
+
+  const copy = useMemo(
+    () => ({
+      eyebrow: isRtl ? "جامعه باز توسعه‌دهندگان و فناوران تجارت" : "OPEN COMMUNITY OF TRADE-TECH DEVELOPERS",
+      titleA: isRtl ? "تلاقی مهندسی نرم‌افزار،" : "Where Code Meets",
+      titleB: isRtl ? "هوش مصنوعی و بازار جهانی" : "Global Trade Intelligence",
+      description: isRtl
+        ? "رسانه‌ای تخصصی و تعاملی برای اشتراک‌گذاری تجربیات واقعی توسعه سیستم‌های توزیع‌شده، پیاده‌سازی هوش تجاری (BI) و بکارگیری مدل‌های زبانی در پروداکشن."
+        : "A premium interactive media platform exploring production-grade distributed systems, trade intelligence, language models, and scalable engineering.",
+      listen: isRtl ? "شنیدن آخرین اپیزود" : "Listen Latest Episode",
+      caseStudy: isRtl ? "بررسی معماری آتریانا" : "Atriana Case Study",
+      castbox: isRtl ? "شنیدن در کست‌باکس" : "Listen on Castbox",
+      caseTitle: isRtl ? "مطالعه موردی: پلتفرم هوشمند آتریانا" : "Case Study: Atriana Intelligent Platform",
+      caseDesc: isRtl
+        ? "چگونه یک پلتفرم یکپارچه تجارت بین‌الملل با استفاده از معماری نوین داده، سیستم‌های تصمیم‌یار هوشمند و هوش مصنوعی مولد ساخته شد؟ در پادکست PRM، چالش‌های مهندسی این پروژه واقعی را کالبدشکافی می‌کنیم."
+        : "A deep breakdown of a unified global trade platform powered by modern data architecture, decision engines, multilingual communication, and generative AI.",
+      footerTitle: isRtl ? "پادکست PRM" : "PRM Podcast",
+      footerDesc: isRtl
+        ? "کالبدشکافی معماری سیستم‌های توزیع‌شده، استراتژی‌های هوش تجاری و پلتفرم‌های بین‌المللی با نگاه خلاق مهندسی."
+        : "A specialized media layer connecting software architecture, AI, technical language, and international trade.",
+      newsletterTitle: isRtl ? "اشتراک خبرنامه آتریانا" : "Receive The Next Signal",
+      newsletterDesc: isRtl ? "ارسال آخرین مستندات فنی معماری و بروزرسانی اپیزودها به صندوق ورودی شما." : "Drop your email to receive new premium releases.",
+      emailPlaceholder: isRtl ? "ایمیل شما..." : "Your email",
+      subscribe: isRtl ? "عضویت" : "Subscribe",
+      invalidEmail: isRtl ? "فرمت ایمیل معتبر نیست." : "Invalid email format.",
+      validEmail: isRtl ? "ایمیل آماده ثبت است." : "Email is ready.",
+    }),
+    [isRtl],
+  );
+
+  const stats = useMemo(
+    () => [
+      {
+        value: "4.2M+",
+        label: isRtl ? "کلان‌داده تجاری" : "Customs Big Data",
+        icon: Database,
+        tone: "text-[#6366f1]",
+      },
+      {
+        value: "LLM Core",
+        label: isRtl ? "هوش اختصاصی" : "Proprietary AI",
+        icon: Sparkles,
+        tone: "text-[#a78bfa]",
+      },
+      {
+        value: "Open Dev",
+        label: isRtl ? "پلتفرم اشتراکی" : "Future Shared Space",
+        icon: Users,
+        tone: "text-[#22d3ee]",
+      },
+      {
+        value: "Bilingual",
+        label: isRtl ? "محتوای دو زبانه" : "Dual Language",
+        icon: Globe,
+        tone: "text-[#f59e0b]",
+      },
+    ],
+    [isRtl],
+  );
+
+  const caseCards = useMemo(
+    () => [
+      {
+        title: isRtl ? "تحلیل داده‌های کلان تجاری" : "Big Data Processing",
+        desc: isRtl
+          ? "پردازش کدهای تعرفه گمرکی (HS Code)، مصورسازی روندهای دلاری/ریالی/وزنی، نقشه پویای تجاری جهان و ایران و مقایسه داده‌های آماری فصول سال."
+          : "Processing HS codes, currency and weight trends, dynamic trade maps, and seasonal analytics for precise decision-making.",
+        icon: Database,
+        tone: "from-[#6366f1]/20 to-[#6366f1]/5 text-[#818cf8]",
+      },
+      {
+        title: isRtl ? "موتور استراتژی AHP و هوش تجاری" : "AHP Strategy Engine & BI",
+        desc: isRtl
+          ? "پیاده‌سازی فرآیند تحلیل سلسله مراتبی (AHP) برای تعیین استراتژی ورود به بازار، ادغام‌شده با چت‌بات‌های اختصاصی تحلیل دیتابیس."
+          : "Modeling AHP-based market-entry strategies connected to analytical chatbots and operational databases.",
+        icon: Cpu,
+        tone: "from-[#a78bfa]/20 to-[#a78bfa]/5 text-[#c4b5fd]",
+      },
+      {
+        title: isRtl ? "ارتباطات و ساختار تعاملی" : "Realtime Multilingual Systems",
+        desc: isRtl
+          ? "مکانیزم پیام‌رسان داخلی مجهز به ترجمه زنده و آنی فارسی/انگلیسی، پروفایل‌های سازمانی چند لایه و مدیریت هوشمند جلسات مذاکره تجاری."
+          : "Internal messaging, live Persian-English translation, corporate profiles, and intelligent trade meeting flows.",
+        icon: Code2,
+        tone: "from-[#22d3ee]/20 to-[#22d3ee]/5 text-[#67e8f9]",
+      },
+    ],
+    [isRtl],
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch("/api/episodes")
+      .then((res) => res.json())
+      .then((data: Episode[]) => {
+        if (!isMounted || !Array.isArray(data) || data.length === 0) return;
+        setEpisodes(data);
+        setCurrentEpisode(data[0]);
+      })
+      .catch(() => {
+        const fallbackEpisode: Episode = {
+          id: "1",
+          episodeNum: "08",
+          titleFa: "آتریانا و نسل بعدی پلتفرم‌های تجارت بین‌الملل",
+          titleEn: "Atriana and Next-Gen International Trade Platforms",
+          descFa: "بررسی عمیق معماری داده و هماهنگی میکروسرویس‌ها در سیستم‌های تصمیم‌یار هوشمند صادرکنندگان.",
+          descEn: "Deep dive into data architecture and microservices coordination in exporters' intelligent decision support systems.",
+          audioUrl: "/audio/episode-08.mp3",
+          duration: "42:18",
+        };
+        if (isMounted) {
+          setEpisodes([fallbackEpisode]);
+          setCurrentEpisode(fallbackEpisode);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+  }, [currentEpisode?.id]);
+
+  const togglePlay = useCallback(async () => {
+    if (!audioRef.current || !currentEpisode) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
+  }, [currentEpisode, isPlaying]);
+
+  const handleTimeUpdate = useCallback(() => {
+    if (!audioRef.current || isSeeking) return;
+    setCurrentTime(audioRef.current.currentTime);
+  }, [isSeeking]);
+
+  const handleLoadedMetadata = useCallback(() => {
+    if (!audioRef.current) return;
+    setDuration(Number.isFinite(audioRef.current.duration) ? audioRef.current.duration : 0);
+  }, []);
+
+  const seekFromClientX = useCallback((clientX: number) => {
+    if (!audioRef.current || !progressBarRef.current) return;
+
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const nextProgress = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const nextTime = nextProgress * (audioRef.current.duration || 0);
+
+    if (Number.isFinite(nextTime)) {
+      audioRef.current.currentTime = nextTime;
+      setCurrentTime(nextTime);
+    }
+  }, []);
+
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setIsSeeking(true);
+      seekFromClientX(event.clientX);
+    },
+    [seekFromClientX],
+  );
+
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!isSeeking) return;
+      seekFromClientX(event.clientX);
+    },
+    [isSeeking, seekFromClientX],
+  );
+
+  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setIsSeeking(false);
+  }, []);
+
+  const formatTime = useCallback((time: number) => {
+    if (!Number.isFinite(time)) return "00:00";
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  }, []);
+
+  const handleNewsletterSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setEmailTouched(true);
+  }, []);
+
+  const heroContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08 },
+    },
+  };
+
+  const heroItem = {
+    hidden: { opacity: 0, y: 18 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.62, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
+  return (
+    <main
+      dir={isRtl ? "rtl" : "ltr"}
+      className={`relative z-10 flex min-h-dvh w-full flex-col overflow-x-clip px-3 pb-32 pt-3 sm:px-5 md:px-8 lg:pb-36 ${
+        lang === "en" ? "font-inter" : "font-vazirmatn"
+      }`}
+    >
+      {currentEpisode && (
+        <audio
+          ref={audioRef}
+          src={currentEpisode.audioUrl}
+          preload="metadata"
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        />
+      )}
+
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <motion.div
+          animate={{ x: [0, 26, -18, 0], y: [0, -22, 18, 0], scale: [1, 1.06, 0.98, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -left-32 -top-32 h-[34rem] w-[34rem] rounded-full bg-[#6366f1]/10 blur-[150px]"
+        />
+        <motion.div
+          animate={{ x: [0, -22, 30, 0], y: [0, 24, -16, 0], scale: [1, 0.96, 1.08, 1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-40 -right-32 h-[34rem] w-[34rem] rounded-full bg-[#22d3ee]/8 blur-[170px]"
+        />
+        <div className="absolute left-1/2 top-1/4 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-[#a78bfa]/5 blur-[190px]" />
+      </div>
+
+      <header className="glass-panel sticky top-3 z-50 mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-3 rounded-3xl px-3 py-3 shadow-2xl shadow-black/30 sm:px-5">
+        <a href="#" className="group flex min-h-11 min-w-11 items-center gap-3 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#22d3ee]/70">
+          <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.033] shadow-inner shadow-white/5">
+            <Radio className="h-5 w-5 text-[#22d3ee]" />
+            <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-[#f59e0b] shadow-[0_0_20px_rgba(245,158,11,0.8)]" />
+          </div>
+          <div className="hidden flex-col sm:flex">
+            <span className="font-mono text-sm font-black tracking-[0.22em] text-white">PRM PODCAST</span>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-white/35">SYS_ACTIVE</span>
+          </div>
+        </a>
+
+        <nav className="hidden items-center gap-2 md:flex" aria-label="Primary">
+          <a href="#case-study" className="rounded-2xl px-4 py-3 text-xs font-bold text-white/60 transition hover:bg-white/[0.04] hover:text-white">
+            {isRtl ? "مطالعه موردی" : "Case Study"}
+          </a>
+          <a href="#episodes" className="rounded-2xl px-4 py-3 text-xs font-bold text-white/60 transition hover:bg-white/[0.04] hover:text-white">
+            {isRtl ? "اپیزودها" : "Episodes"}
+          </a>
+          <a href="#footer" className="rounded-2xl px-4 py-3 text-xs font-bold text-white/60 transition hover:bg-white/[0.04] hover:text-white">
+            {isRtl ? "عضویت" : "Subscribe"}
+          </a>
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setLang(lang === "fa" ? "en" : "fa")}
+            className="glass-card flex h-11 min-w-11 items-center justify-center rounded-2xl px-3 font-mono text-xs font-black text-white/80 outline-none transition active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22d3ee]/70"
+            aria-label="Change language"
+          >
+            {lang === "fa" ? "EN" : "FA"}
+          </button>
+          <a
+            href="https://castbox.fm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glass-card hidden h-11 items-center gap-2 rounded-2xl px-4 text-xs font-extrabold text-white outline-none transition hover:text-[#22d3ee] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22d3ee]/70 sm:flex"
+          >
+            <span>{copy.castbox}</span>
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </div>
+      </header>
+
+      <motion.section
+        variants={heroContainer}
+        initial="hidden"
+        animate="show"
+        className="relative mx-auto grid w-full max-w-7xl items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:py-24 xl:gap-16"
+      >
+        <div className={`relative z-10 flex flex-col ${isRtl ? "items-start text-right" : "items-start text-left"}`}>
+          <motion.div variants={heroItem} className="mb-5 inline-flex min-h-11 items-center gap-3 rounded-full border border-[#22d3ee]/15 bg-[#22d3ee]/5 px-4 py-2 shadow-[0_0_50px_rgba(34,211,238,0.08)]">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22d3ee] opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#22d3ee]" />
+            </span>
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#67e8f9] sm:text-xs">{copy.eyebrow}</span>
+          </motion.div>
+
+          <motion.h1 variants={heroItem} className="max-w-5xl text-[clamp(2.5rem,7vw,6.5rem)] font-black leading-[1.1] tracking-tight text-white">
+            {copy.titleA}
+            <span className="mt-2 block bg-gradient-to-r from-[#6366f1] via-[#a78bfa] to-[#22d3ee] bg-clip-text text-transparent">{copy.titleB}</span>
+          </motion.h1>
+
+          <motion.p variants={heroItem} className="mt-7 max-w-3xl text-base font-medium leading-8 text-slate-400 sm:text-lg">
+            {copy.description}
+          </motion.p>
+
+          <motion.div variants={heroItem} className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              onClick={togglePlay}
+              disabled={!currentEpisode}
+              className="group flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-[#6366f1] via-[#8b5cf6] to-[#22d3ee] px-6 py-3 text-sm font-black text-white shadow-[0_18px_55px_rgba(99,102,241,0.28)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_75px_rgba(34,211,238,0.25)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isPlaying ? <Pause className="h-5 w-5 fill-white" /> : <Play className="h-5 w-5 fill-white" />}
+              <span>{copy.listen}</span>
+            </button>
+            <a
+              href="#case-study"
+              className="glass-card flex min-h-12 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-sm font-black text-white outline-none transition active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22d3ee]/70"
+            >
+              <span>{copy.caseStudy}</span>
+              <ArrowUpRight className="h-4 w-4 text-[#22d3ee]" />
+            </a>
+          </motion.div>
+
+          <motion.div variants={heroItem} className="mt-9 grid w-full grid-cols-2 gap-3 lg:max-w-3xl xl:grid-cols-4">
+            {stats.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.value} className="glass-card group min-h-[116px] rounded-3xl p-4">
+                  <div className={`flex h-full flex-col justify-between ${isRtl ? "items-start text-right" : "items-start text-left"}`}>
+                    <Icon className={`h-5 w-5 ${item.tone}`} />
+                    <div>
+                      <div className="font-mono text-lg font-black text-white">{item.value}</div>
+                      <div className="mt-1 text-xs font-semibold leading-5 text-slate-500">{item.label}</div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </motion.div>
+        </div>
+
+        <motion.div variants={heroItem} className="relative mx-auto w-full max-w-[38rem] lg:max-w-none">
+          <div className="absolute inset-8 rounded-full bg-[#6366f1]/20 blur-[120px]" />
+          <motion.div
+            whileHover={{ rotateX: 6, rotateY: isRtl ? -8 : 8, scale: 1.015 }}
+            transition={{ type: "spring", stiffness: 180, damping: 18 }}
+            className="hero-hologram relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#050816]/70 p-4 shadow-[0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-3xl sm:p-6"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(99,102,241,0.24),transparent_32%),radial-gradient(circle_at_90%_20%,rgba(34,211,238,0.18),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.07),transparent_32%)]" />
+            <div className="relative grid gap-4">
+              <div className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/[0.035] p-4">
+                <div className={`flex items-center gap-3 ${isRtl ? "text-right" : "text-left"}`}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366f1]/15">
+                    <Headphones className="h-6 w-6 text-[#a5b4fc]" />
+                  </div>
+                  <div>
+                    <div className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-white/35">LATENCY TIME</div>
+                    <div className="mt-1 text-sm font-black text-white">4.12 ms</div>
+                  </div>
+                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#22d3ee]/10">
+                  <Zap className="h-5 w-5 text-[#67e8f9]" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <motion.div whileHover={{ y: -6 }} className="rounded-3xl border border-white/10 bg-black/20 p-4">
+                  <Cpu className="mb-8 h-6 w-6 text-[#c4b5fd]" />
+                  <div className="font-mono text-2xl font-black text-white">AI</div>
+                  <div className="mt-1 text-xs font-semibold text-slate-500">{isRtl ? "مدل‌های تولیدی" : "Generative Models"}</div>
+                </motion.div>
+                <motion.div whileHover={{ y: -6 }} className="rounded-3xl border border-white/10 bg-black/20 p-4">
+                  <Globe className="mb-8 h-6 w-6 text-[#67e8f9]" />
+                  <div className="font-mono text-2xl font-black text-white">Trade</div>
+                  <div className="mt-1 text-xs font-semibold text-slate-500">{isRtl ? "بازار جهانی" : "Global Market"}</div>
+                </motion.div>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-4">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#22d3ee]">Waveform Intelligence</span>
+                  <Volume2 className="h-4 w-4 text-white/50" />
+                </div>
+                <div className="flex h-24 items-end gap-1.5 overflow-hidden">
+                  {visualizerHeights.map((height, index) => (
+                    <span
+                      key={index}
+                      className={`flex-1 rounded-full bg-gradient-to-t from-[#6366f1] via-[#a78bfa] to-[#22d3ee] opacity-80 ${isPlaying ? "wave-bar" : ""}`}
+                      style={{
+                        height: `${height}px`,
+                        animationDelay: `${index * 0.045}s`,
+                        animationPlayState: isPlaying ? "running" : "paused",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <motion.div
+              animate={{ scale: [1, 1.22, 1], opacity: [0.75, 0.35, 0.75] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute left-[14%] top-[24%] h-4 w-4 rounded-full border border-[#22d3ee] bg-[#22d3ee]/40 shadow-[0_0_35px_rgba(34,211,238,0.9)]"
+            />
+            <motion.div
+              animate={{ scale: [1, 1.28, 1], opacity: [0.8, 0.3, 0.8] }}
+              transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+              className="absolute bottom-[28%] right-[18%] h-5 w-5 rounded-full border border-[#a78bfa] bg-[#a78bfa]/35 shadow-[0_0_40px_rgba(167,139,250,0.85)]"
+            />
+          </motion.div>
+        </motion.div>
+      </motion.section>
+
+      <section aria-label="Technology keywords" className="marquee-mask mx-auto mb-16 w-screen max-w-none overflow-hidden border-y border-white/10 bg-white/[0.035] py-4 backdrop-blur-2xl">
+        <div className="marquee-track flex w-max items-center gap-8 will-change-transform">
+          {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (
+            <div key={`${item}-${index}`} className="flex items-center gap-8 whitespace-nowrap">
+              <span className="font-mono text-sm font-black uppercase tracking-[0.28em] text-white/70 sm:text-base">{item}</span>
+              <span className="h-2 w-2 rounded-full bg-[#22d3ee] shadow-[0_0_22px_rgba(34,211,238,0.8)]" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="case-study" className="mx-auto w-full max-w-7xl py-4 sm:py-8">
+        <div className={`mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end ${isRtl ? "text-right" : "text-left"}`}>
+          <div className="max-w-3xl">
+            <div className="mb-4 inline-flex rounded-full border border-[#22d3ee]/15 bg-[#22d3ee]/5 px-4 py-2 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#67e8f9]">
+              PRODUCTION ARCHITECTURE
+            </div>
+            <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{copy.caseTitle}</h2>
+            <p className="mt-4 text-sm font-medium leading-7 text-slate-400 sm:text-base">{copy.caseDesc}</p>
+          </div>
+          <div className="glass-card flex min-h-12 items-center gap-3 rounded-2xl px-4 py-3">
+            <ShieldCheck className="h-5 w-5 text-[#22d3ee]" />
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-white/60">Verified Stack</span>
+          </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-3">
+          {caseCards.map((card, index) => {
+            const Icon = card.icon;
+            return (
+              <motion.article
+                key={card.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.55, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className={`glass-card group relative overflow-hidden rounded-[1.75rem] p-6 ${isRtl ? "text-right" : "text-left"}`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${card.tone} opacity-60 transition group-hover:opacity-100`} />
+                <div className="relative">
+                  <div className="mb-10 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/20">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-black text-white">{card.title}</h3>
+                  <p className="mt-3 text-sm font-medium leading-7 text-slate-400">{card.desc}</p>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
+      {episodes.length > 0 && (
+        <section id="episodes" className="mx-auto w-full max-w-7xl py-16">
+          <div className={`mb-6 flex items-center justify-between gap-4 ${isRtl ? "text-right" : "text-left"}`}>
+            <div>
+              <h2 className="text-2xl font-black text-white sm:text-3xl">{isRtl ? "اپیزودهای منتخب" : "Featured Episodes"}</h2>
+              <p className="mt-2 text-sm font-medium text-slate-500">{isRtl ? "برای تغییر اپیزود روی کارت بزن." : "Tap a card to switch the player."}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {episodes.slice(0, 3).map((episode) => {
+              const active = currentEpisode?.id === episode.id;
+              return (
+                <button
+                  key={episode.id}
+                  type="button"
+                  onClick={() => setCurrentEpisode(episode)}
+                  className={`glass-card min-h-[148px] rounded-[1.6rem] p-5 text-start transition active:scale-[0.99] ${
+                    active ? "border-[#22d3ee]/25 bg-[#22d3ee]/5 shadow-[0_18px_70px_rgba(34,211,238,0.1)]" : ""
+                  }`}
+                >
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[10px] font-black text-white/60">
+                      EP {episode.episodeNum}
+                    </span>
+                    <span className="font-mono text-[10px] font-bold text-slate-500">{episode.duration}</span>
+                  </div>
+                  <h3 className="line-clamp-2 text-sm font-black leading-6 text-white">{isRtl ? episode.titleFa : episode.titleEn}</h3>
+                  <p className="mt-2 line-clamp-2 text-xs font-medium leading-6 text-slate-500">{isRtl ? episode.descFa : episode.descEn}</p>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <footer id="footer" className="relative mx-auto mt-8 w-full max-w-7xl pb-10 [perspective:1400px]">
+        <motion.div
+          initial={{ opacity: 0, y: 24, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: "-120px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="footer-3d relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#050816]/75 p-5 shadow-[0_45px_140px_rgba(0,0,0,0.7)] backdrop-blur-3xl sm:p-7 lg:p-8"
+        >
+          <div className="footer-grid-bg absolute inset-0 opacity-70" />
+          <div className="absolute -left-24 top-0 h-64 w-64 rounded-full bg-[#6366f1]/18 blur-[100px]" />
+          <div className="absolute -bottom-28 right-0 h-72 w-72 rounded-full bg-[#22d3ee]/12 blur-[110px]" />
+
+          <div className="relative grid gap-5 lg:grid-cols-[1.1fr_0.9fr_1fr]">
+            <section className={`rounded-[1.7rem] border border-white/10 bg-white/[0.035] p-5 ${isRtl ? "text-right" : "text-left"}`}>
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366f1]/15">
+                  <Radio className="h-6 w-6 text-[#a5b4fc]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-white">{copy.footerTitle}</h2>
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-white/35">Premium Audio Intelligence</p>
+                </div>
+              </div>
+              <p className="text-sm font-medium leading-7 text-slate-400">{copy.footerDesc}</p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["AI", "BI", "DevOps", "TradeTech"].map((tag) => (
+                  <span key={tag} className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/50">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[1.7rem] border border-white/10 bg-white/[0.035] p-5">
+              <div className="mb-5 flex items-center justify-between">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-[#22d3ee]">Signal Pulse</span>
+                <span className="h-2.5 w-2.5 rounded-full bg-[#22d3ee] shadow-[0_0_22px_rgba(34,211,238,0.8)]" />
+              </div>
+              <div className="flex h-40 items-center justify-center">
+                <div className="footer-orbit relative flex h-32 w-32 items-center justify-center rounded-full border border-[#22d3ee]/20">
+                  <div className="absolute h-24 w-24 rounded-full border border-[#6366f1]/20" />
+                  <div className="absolute h-16 w-16 rounded-full border border-[#a78bfa]/20" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.06] shadow-[0_0_45px_rgba(34,211,238,0.18)]">
+                    <Volume2 className="h-6 w-6 text-[#22d3ee]" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-end justify-center gap-1.5">
+                {visualizerHeights.slice(0, 18).map((height, index) => (
+                  <span
+                    key={index}
+                    className="footer-wave w-1.5 rounded-full bg-gradient-to-t from-[#6366f1] to-[#22d3ee]"
+                    style={{ height: `${Math.max(12, height * 0.75)}px`, animationDelay: `${index * 0.06}s` }}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section className={`rounded-[1.7rem] border border-white/10 bg-white/[0.035] p-5 ${isRtl ? "text-right" : "text-left"}`}>
+              <div className="mb-5">
+                <h2 className="text-lg font-black text-white">{copy.newsletterTitle}</h2>
+                <p className="mt-2 text-sm font-medium text-slate-500">{copy.newsletterDesc}</p>
+              </div>
+
+              <form onSubmit={handleNewsletterSubmit} className="space-y-3" noValidate>
+                <label className="relative block">
+                  <Mail className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-white/30 ${isRtl ? "right-4" : "left-4"}`} />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    onBlur={() => setEmailTouched(true)}
+                    placeholder={copy.emailPlaceholder}
+                    aria-invalid={showEmailError}
+                    className={`h-12 w-full rounded-2xl border bg-black/20 px-12 text-sm font-bold text-white outline-none transition placeholder:text-white/25 focus:ring-2 ${
+                      showEmailError
+                        ? "border-red-400/45 focus:ring-red-400/20"
+                        : showEmailSuccess
+                          ? "border-emerald-400/45 focus:ring-emerald-400/20"
+                          : "border-white/10 focus:border-[#22d3ee]/40 focus:ring-[#22d3ee]/15"
+                    }`}
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white text-sm font-black text-[#030712] transition hover:bg-[#22d3ee] active:scale-[0.99]"
+                >
+                  <span>{copy.subscribe}</span>
+                  <Send className="h-4 w-4" />
+                </button>
+
+                <div className="min-h-5 text-xs font-bold">
+                  {showEmailError && <span className="text-red-300">{copy.invalidEmail}</span>}
+                  {showEmailSuccess && <span className="text-emerald-300">{copy.validEmail}</span>}
+                </div>
+              </form>
+
+              <div className="mt-5 flex gap-2">
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="social-glow flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] text-white/60 transition hover:-translate-y-0.5 hover:text-white active:scale-95"
+                >
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                  </svg>
+                </a>
+                <a
+                  href="mailto:hello@example.com"
+                  aria-label="Mail"
+                  className="social-glow flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] text-white/60 transition hover:-translate-y-0.5 hover:text-white active:scale-95"
+                >
+                  <Mail className="h-5 w-5" />
+                </a>
+              </div>
+            </section>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 font-mono text-[10px] font-bold text-slate-500 sm:flex-row">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
+              <span>CURRENT CORE VERSION: ATRIANA-V4.12.8-STABLE</span>
+              <span>SERVER STATE: ONLINE - READY TO ROUTE</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 sm:items-end">
+              <span>© ۲۰۲۶ پادکست PRM. تمامی حقوق محفوظ است.</span>
+              <span className="text-white/20">BUILD: NEXT15_DEVSYSTEM_STABLE</span>
+            </div>
+          </div>
+        </motion.div>
+      </footer>
+
+      <AnimatePresence mode="wait">
+        {currentEpisode && (
+          <motion.aside
+            initial={{ opacity: 0, y: 32, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 32, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-6xl sm:bottom-5"
+            aria-label="Audio player"
+          >
+            <div className="player-shell rounded-[1.75rem] border border-white/10 bg-[#050816]/82 p-3 shadow-[0_25px_90px_rgba(0,0,0,0.65)] backdrop-blur-3xl sm:p-4">
+              <div className={`grid items-center gap-4 md:grid-cols-[1fr_auto_1.05fr] ${isRtl ? "md:[direction:rtl]" : "md:[direction:ltr]"}`}>
+                <div className={`flex min-w-0 items-center gap-3 ${isRtl ? "text-right" : "text-left"}`}>
+                  <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#6366f1] via-[#8b5cf6] to-[#22d3ee] shadow-[0_15px_45px_rgba(99,102,241,0.3)]">
+                    <span className="absolute left-1.5 top-1.5 rounded-md bg-black/45 px-1.5 py-0.5 font-mono text-[8px] font-black text-[#fbbf24]">EP</span>
+                    <span className="font-mono text-xl font-black text-white">{currentEpisode.episodeNum}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[#f59e0b] shadow-[0_0_20px_rgba(245,158,11,0.75)]" />
+                      <h3 className="truncate text-sm font-black text-white sm:text-base">{isRtl ? currentEpisode.titleFa : currentEpisode.titleEn}</h3>
+                    </div>
+                    <p className="line-clamp-1 text-xs font-medium text-slate-500">{isRtl ? currentEpisode.descFa : currentEpisode.descEn}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="mx-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-[#030712] shadow-[0_18px_55px_rgba(255,255,255,0.16)] transition hover:scale-105 hover:bg-[#22d3ee] active:scale-95 md:h-16 md:w-16"
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                >
+                  {isPlaying ? <Pause className="h-6 w-6 fill-[#030712]" /> : <Play className="h-6 w-6 fill-[#030712]" />}
+                </button>
+
+                <div className="grid min-w-0 gap-3">
+                  <div className="hidden h-8 items-end gap-1 md:flex">
+                    {visualizerHeights.slice(0, 26).map((height, index) => (
+                      <span
+                        key={index}
+                        className={`flex-1 rounded-full bg-gradient-to-t from-[#6366f1]/60 to-[#22d3ee]/90 ${isPlaying ? "wave-bar" : ""}`}
+                        style={{
+                          height: `${Math.max(8, height * 0.62)}px`,
+                          animationDelay: `${index * 0.045}s`,
+                          animationPlayState: isPlaying ? "running" : "paused",
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className={`flex items-center justify-between font-mono text-[10px] font-bold text-slate-500 ${isRtl ? "flex-row-reverse" : "flex-row"}`}>
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{duration > 0 ? formatTime(duration) : currentEpisode.duration}</span>
+                    </div>
+
+                    <div
+                      ref={progressBarRef}
+                      role="slider"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(progress)}
+                      tabIndex={0}
+                      onPointerDown={handlePointerDown}
+                      onPointerMove={handlePointerMove}
+                      onPointerUp={handlePointerUp}
+                      onPointerCancel={handlePointerUp}
+                      className="group flex h-8 cursor-pointer touch-none items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#22d3ee]/70"
+                    >
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/10 transition-all duration-300 group-hover:h-3">
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#6366f1] via-[#a78bfa] to-[#22d3ee] shadow-[0_0_28px_rgba(34,211,238,0.55)]"
+                          style={{ width: `${progress}%` }}
+                        />
+                        <div
+                          className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-[#22d3ee] opacity-0 shadow-[0_0_24px_rgba(34,211,238,0.9)] transition group-hover:opacity-100"
+                          style={{ left: `calc(${progress}% - 8px)` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </main>
+  );
+}
+
+"

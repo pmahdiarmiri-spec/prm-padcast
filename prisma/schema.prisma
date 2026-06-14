@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Episode {
+  id         Int      @id @default(autoincrement())
+  episodeNum String   @unique
+  titleFa    String
+  titleEn    String
+  descFa     String
+  descEn     String
+  audioUrl   String
+  duration   String
+  createdAt  DateTime @default(now())
+}

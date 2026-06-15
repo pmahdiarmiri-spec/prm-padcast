@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { Play, Pause, ArrowRight, Share2, Clock, Headphones, RotateCcw, RotateCw } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Play, Pause, Share2, Clock, Headphones, RotateCcw, RotateCw } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 interface Episode {
   id: string;
@@ -18,12 +18,16 @@ interface Episode {
 }
 
 export default function EpisodeClientPage({ episode }: { episode: Episode }) {
-  const router = useRouter();
   const [lang, setLang] = useState<"fa" | "en">("fa");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("prm_lang") as "fa" | "en" | null;
+    if (savedLang) setLang(savedLang);
+  }, []);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -48,9 +52,17 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current || !progressBarRef.current || !audioRef.current.duration) return;
     const rect = progressBarRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
     const width = rect.width;
-    const percentage = Math.max(0, Math.min(1, clickX / width));
+    let percentage = 0;
+
+    if (lang === "fa") {
+      const clickX = rect.right - e.clientX;
+      percentage = Math.max(0, Math.min(1, clickX / width));
+    } else {
+      const clickX = e.clientX - rect.left;
+      percentage = Math.max(0, Math.min(1, clickX / width));
+    }
+
     const newTime = percentage * audioRef.current.duration;
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
@@ -78,20 +90,20 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
   const shareEpisode = () => {
     if (navigator.share) {
       navigator.share({
-        title: episode.titleFa,
-        text: episode.descFa,
+        title: lang === "fa" ? episode.titleFa : episode.titleEn,
+        text: lang === "fa" ? episode.descFa : episode.descEn,
         url: window.location.href,
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert("لینک اپیزود کپی شد.");
+      alert(lang === "fa" ? "لینک اپیزود کپی شد." : "Link copied to clipboard.");
     }
   };
 
   const isRtl = lang === "fa";
 
   return (
-    <main dir={isRtl ? "rtl" : "ltr"} className={`relative min-h-screen flex flex-col p-4 md:p-8 z-10 ${lang === "en" ? "font-inter" : "font-vazirmatn"}`}>
+    <main dir={isRtl ? "rtl" : "ltr"} className={`relative min-h-screen flex flex-col p-4 md:p-8 z-10 justify-between ${lang === "en" ? "font-inter" : "font-vazirmatn"}`}>
       <audio
         ref={audioRef}
         src={episode.audioUrl}
@@ -104,24 +116,7 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
         <div className="absolute bottom-[20%] left-[-10%] w-[450px] h-[450px] rounded-full bg-[#a78bfa]/6 blur-[180px]" />
       </div>
 
-      <header className="glass-panel sticky top-4 z-50 w-full max-w-7xl mx-auto rounded-2xl px-5 py-3.5 flex justify-between items-center transition-all duration-300">
-        <button 
-          onClick={() => router.push("/")}
-          className="glass-card px-4 py-2 rounded-xl text-xs font-semibold text-white flex items-center gap-2 hover:border-[#6366f1]/20 hover:text-[#22d3ee] active:scale-95"
-        >
-          <ArrowRight className={`w-4 h-4 ${isRtl ? "" : "rotate-180"}`} />
-          <span>{isRtl ? "بازگشت به خانه" : "Back to Home"}</span>
-        </button>
-
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setLang(lang === "fa" ? "en" : "fa")} 
-            className="glass-card font-mono w-10 h-10 rounded-xl text-xs font-bold text-white/80 hover:text-white flex items-center justify-center hover:border-[#6366f1]/20 active:scale-95"
-          >
-            {lang === "fa" ? "EN" : "FA"}
-          </button>
-        </div>
-      </header>
+      <Header lang={lang} setLang={setLang} showBack={true} />
 
       <section className="w-full max-w-4xl mx-auto my-auto py-10 flex flex-col gap-8">
         <motion.div 
@@ -234,7 +229,7 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
               className="w-full bg-slate-800/80 h-[5px] rounded-full overflow-hidden cursor-pointer relative group"
             >
               <div 
-                className="bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full" 
+                className={`bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full absolute top-0 ${isRtl ? "right-0" : "left-0"}`} 
                 style={{  
                   width: audioRef.current && audioRef.current.duration ? `${(currentTime / audioRef.current.duration) * 100}%` : "0%" 
                 }} 

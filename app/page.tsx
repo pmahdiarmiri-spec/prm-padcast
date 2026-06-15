@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Activity, Layers, Rocket } from "lucide-react";
+import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal } from "lucide-react";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 interface Episode {
   id: string;
@@ -28,6 +29,9 @@ export default function Home() {
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const savedLang = localStorage.getItem("prm_lang") as "fa" | "en" | null;
+    if (savedLang) setLang(savedLang);
+
     fetch("/api/episodes")
       .then((res) => {
         const contentType = res.headers.get("content-type");
@@ -97,9 +101,17 @@ export default function Home() {
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current || !progressBarRef.current || !audioRef.current.duration) return;
     const rect = progressBarRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
     const width = rect.width;
-    const percentage = Math.max(0, Math.min(1, clickX / width));
+    let percentage = 0;
+
+    if (lang === "fa") {
+      const clickX = rect.right - e.clientX;
+      percentage = Math.max(0, Math.min(1, clickX / width));
+    } else {
+      const clickX = e.clientX - rect.left;
+      percentage = Math.max(0, Math.min(1, clickX / width));
+    }
+
     const newTime = percentage * audioRef.current.duration;
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
@@ -145,34 +157,7 @@ export default function Home() {
         <div className="absolute top-[30%] left-[20%] w-[450px] h-[450px] rounded-full bg-[#22d3ee]/3 blur-[200px]" />
       </div>
 
-      <header className="glass-panel sticky top-4 z-50 w-full max-w-7xl mx-auto rounded-2xl px-5 py-3.5 flex justify-between items-center transition-all duration-300">
-        <div className="flex items-center gap-3">
-          <div className="flex items-end gap-[3px] h-5 w-6">
-            <span className="w-[3px] h-3 bg-[#6366f1] rounded-full wave-bar" style={{ animationDelay: "0.1s" }} />
-            <span className="w-[3px] h-5 bg-[#a78bfa] rounded-full wave-bar" style={{ animationDelay: "0.3s" }} />
-            <span className="w-[3px] h-4 bg-[#22d3ee] rounded-full wave-bar" style={{ animationDelay: "0.5s" }} />
-            <span className="w-[3px] h-2 bg-[#6366f1] rounded-full wave-bar" style={{ animationDelay: "0.2s" }} />
-            <span className="w-[3px] h-4 bg-[#a78bfa] rounded-full wave-bar" style={{ animationDelay: "0.4s" }} />
-          </div>
-          <span className="font-mono font-black text-lg tracking-wider text-white">PRM PODCAST</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setLang(lang === "fa" ? "en" : "fa")} 
-            className="glass-card font-mono w-10 h-10 rounded-xl text-xs font-bold text-white/80 hover:text-white flex items-center justify-center hover:border-[#6366f1]/20 active:scale-95"
-          >
-            {lang === "fa" ? "EN" : "FA"}
-          </button>
-          <a 
-            href="#episodes-archive" 
-            className="glass-card px-4 py-2.5 rounded-xl text-xs font-semibold text-white flex items-center gap-2 hover:border-[#6366f1]/20 hover:text-[#22d3ee] active:scale-95"
-          >
-            <span>{isRtl ? "آرشیو کل قسمت‌ها" : "Episodes Archive"}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </header>
+      <Header lang={lang} setLang={setLang} />
 
       <motion.section 
         variants={containerVariants}
@@ -376,7 +361,7 @@ export default function Home() {
             <h4 className="text-base font-extrabold text-white">{isRtl ? "موتورهای بلادرنگ و ترجمه همزمان" : "Realtime Translation Engine"}</h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isRtl 
-                ? "معماری ارتباطات زنده پیام‌رسان درون‌برنامه‌ای چندزبانه همراه با مکانیزم ترجمه متقارن فارسی به انگلیسی با زمان تأخیر بسیار پایین." 
+                ? "معماری ارتباطات زنده پیام‌رسان درون‌برنامه‌ای چندزبانه همراه با مکانیزم ترجمه متقارن فارسی به انگلیسی با زمان تأخایت بسیار پایین." 
                 : "Engineering realtime chats with end-to-end multi-layered business profiles and instant, low-latency Persian/English translators."}
             </p>
           </motion.div>
@@ -452,7 +437,7 @@ export default function Home() {
                       className="w-full bg-slate-800 h-[3px] rounded-full overflow-hidden cursor-pointer relative group"
                     >
                       <div 
-                        className="bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full" 
+                        className={`bg-gradient-to-r from-[#6366f1] to-[#22d3ee] h-full transition-all duration-100 rounded-full absolute top-0 ${isRtl ? "right-0" : "left-0"}`} 
                         style={{  
                           width: audioRef.current && audioRef.current.duration ? `${(currentTime / audioRef.current.duration) * 100}%` : "0%" 
                         }} 

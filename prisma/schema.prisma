@@ -15,6 +15,7 @@ model Episode {
   descFa     String
   descEn     String
   audioUrl   String
+  coverUrl   String?  @default("")
   duration   String
   createdAt  DateTime @default(now())
 }

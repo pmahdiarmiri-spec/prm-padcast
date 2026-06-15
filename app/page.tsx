@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal } from "lucide-react";
+import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Headphones } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
@@ -14,6 +14,7 @@ interface Episode {
   descFa: string;
   descEn: string;
   audioUrl: string;
+  coverUrl?: string;
   duration: string;
   episodeNum: string;
 }
@@ -255,20 +256,29 @@ export default function Home() {
                 currentEpisode?.id === ep.id ? "border-[#6366f1]/50 bg-[#6366f1]/5" : ""
               }`}
             >
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-center">
                 <span className="font-mono text-xs bg-[#6366f1]/10 text-[#6366f1] px-2.5 py-1 rounded-lg font-bold">
                   EP {ep.episodeNum}
                 </span>
                 <span className="font-mono text-xs text-slate-500">{ep.duration}</span>
               </div>
 
-              <div className={isRtl ? "text-right" : "text-left"}>
-                <h4 className="text-lg font-black text-white mb-2 line-clamp-1 group-hover:text-[#22d3ee] transition-colors">
-                  {isRtl ? ep.titleFa : ep.titleEn}
-                </h4>
-                <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
-                  {isRtl ? ep.descFa : ep.descEn}
-                </p>
+              <div className="flex gap-4 items-center">
+                {ep.coverUrl ? (
+                  <img src={ep.coverUrl} alt={ep.titleEn} className="w-14 h-14 rounded-xl object-cover border border-white/10 flex-shrink-0" />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 flex-shrink-0">
+                    <Headphones className="w-6 h-6 text-slate-400" />
+                  </div>
+                )}
+                <div className={isRtl ? "text-right" : "text-left"}>
+                  <h4 className="text-base font-black text-white mb-1 line-clamp-1 group-hover:text-[#22d3ee] transition-colors">
+                    {isRtl ? ep.titleFa : ep.titleEn}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                    {isRtl ? ep.descFa : ep.descEn}
+                  </p>
+                </div>
               </div>
 
               <button 
@@ -379,8 +389,12 @@ export default function Home() {
             <div className={`flex flex-col md:flex-row items-center justify-between gap-6 ${isRtl ? "md:flex-row" : "md:flex-row-reverse"}`}>
               <div className={`flex items-center gap-4 w-full md:w-auto ${isRtl ? "text-right" : "text-left"} ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
                 <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center flex-shrink-0 overflow-hidden shadow-inner">
+                  {currentEpisode.coverUrl ? (
+                    <img src={currentEpisode.coverUrl} alt={currentEpisode.titleEn} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-white font-black text-xl md:text-2xl font-mono">{currentEpisode.episodeNum}</span>
+                  )}
                   <span className="font-mono text-[9px] font-black text-[#f59e0b] absolute top-1.5 left-1.5 bg-black/50 px-1.5 py-0.5 rounded">EP {currentEpisode.episodeNum}</span>
-                  <span className="text-white font-black text-xl md:text-2xl font-mono">{currentEpisode.episodeNum}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className={`flex items-center gap-2 ${isRtl ? "flex-row" : "flex-row-reverse"}`}>

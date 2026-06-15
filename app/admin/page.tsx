@@ -9,15 +9,19 @@ export default function AdminPortal() {
   const [passwordInput, setPasswordInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [publishing, setPublishing] = useState(false);
   const [publishProgress, setPublishProgress] = useState(0);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [form, setForm] = useState({
     titleFa: "",
     titleEn: "",
     descFa: "",
     descEn: "",
     audioUrl: "",
+    coverUrl: "",
     duration: "",
     episodeNum: "",
   });
@@ -82,6 +86,48 @@ export default function AdminPortal() {
     xhr.send(formData);
   };
 
+  const handleImageUpload = () => {
+    if (!imageFile || !authToken) return;
+    setImageUploading(true);
+    setImageUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append("file", imageFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload", true);
+    xhr.setRequestHeader("Authorization", authToken);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setImageUploadProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      setImageUploading(false);
+      try {
+        const response = JSON.parse(xhr.responseText);
+        if (xhr.status === 200) {
+          setForm((prev) => ({ ...prev, coverUrl: response.url }));
+          alert("تصویر کاور با موفقیت آپلود شد.");
+        } else {
+          alert(`خطا در آپلود تصویر: ${response.error || "نامشخص"}`);
+        }
+      } catch {
+        alert("خطای سرور در آپلود تصویر.");
+      }
+    };
+
+    xhr.onerror = () => {
+      setImageUploading(false);
+      alert("ارتباط با سرور برقرار نشد.");
+    };
+
+    xhr.send(formData);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!authToken) return;
@@ -106,7 +152,7 @@ export default function AdminPortal() {
       }
     };
 
-        xhr.onload = () => {
+    xhr.onload = () => {
       setPublishing(false);
       try {
         const response = JSON.parse(xhr.responseText);
@@ -121,7 +167,6 @@ export default function AdminPortal() {
         alert(`خطای ناخواسته سرور رخ داد. وضعیت: ${xhr.status}. برای مشاهده متن خطا Console مرورگر را بررسی کنید.`);
       }
     };
-
 
     xhr.onerror = () => {
       setPublishing(false);
@@ -203,6 +248,50 @@ export default function AdminPortal() {
           )}
         </div>
 
+        <div className="flex flex-col gap-4 bg-[#0d1117] p-5 rounded-2xl border border-white/5">
+          <span className="text-xs text-slate-400 font-bold">انتخاب کاور اپیزود (مربع - مثلاً 1400x1400)</span>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              className="flex-1 text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#22d3ee]/10 file:text-[#22d3ee] hover:file:bg-[#22d3ee]/20 file:cursor-pointer"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            />
+            <button
+              type="button"
+              disabled={imageUploading || !imageFile}
+              onClick={handleImageUpload}
+              className="px-6 py-2.5 rounded-xl bg-[#22d3ee] hover:bg-[#22d3ee]/95 text-slate-950 text-xs font-bold disabled:opacity-50 transition-all"
+            >
+              {imageUploading ? "در حال ارسال..." : "آپلود کاور"}
+            </button>
+          </div>
+
+          {imageUploading && (
+            <div className="w-full mt-2">
+              <div className="flex justify-between text-xs text-slate-400 mb-1 font-mono">
+                <span>{imageUploadProgress}%</span>
+                <span>در حال آپلود تصویر کاور روی سرور</span>
+              </div>
+              <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-[#22d3ee] to-[#a78bfa] h-full transition-all duration-150 rounded-full" 
+                  style={{ width: `${imageUploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {form.coverUrl && (
+            <div className="flex items-center gap-4 mt-2">
+              <img src={form.coverUrl} alt="Cover Preview" className="w-16 h-16 rounded-xl object-cover border border-white/10" />
+              <span className="text-xs text-emerald-400 font-mono" dir="ltr">
+                Cover Path: {form.coverUrl}
+              </span>
+            </div>
+          )}
+        </div>
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
@@ -240,7 +329,7 @@ export default function AdminPortal() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <input
               type="text"
               placeholder="شماره اپیزود (مثلا: 01)"
@@ -264,6 +353,14 @@ export default function AdminPortal() {
               value={form.audioUrl}
               onChange={(e) => setForm({ ...form, audioUrl: e.target.value })}
               required
+              readOnly
+            />
+            <input
+              type="text"
+              placeholder="مسیر کاور"
+              className="w-full bg-[#0d1117]/50 border border-white/10 rounded-xl p-3 text-white outline-none text-center font-mono text-xs"
+              value={form.coverUrl}
+              onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
               readOnly
             />
           </div>

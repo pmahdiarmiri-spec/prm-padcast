@@ -27,11 +27,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: episode.descEn.slice(0, 160),
       type: "music.song",
       audio: episode.audioUrl,
+      images: episode.coverUrl ? [{ url: episode.coverUrl }] : [],
     },
     twitter: {
       card: "summary_large_image",
       title: episode.titleFa,
       description: episode.descFa.slice(0, 160),
+      images: episode.coverUrl ? [episode.coverUrl] : [],
     },
   };
 }
@@ -54,6 +56,7 @@ export default async function EpisodePage({ params }: Props) {
     descFa: episode.descFa,
     descEn: episode.descEn,
     audioUrl: episode.audioUrl,
+    coverUrl: episode.coverUrl || "",
     duration: episode.duration,
   };
 

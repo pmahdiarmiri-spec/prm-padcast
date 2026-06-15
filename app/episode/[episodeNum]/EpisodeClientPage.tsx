@@ -13,6 +13,7 @@ interface Episode {
   descFa: string;
   descEn: string;
   audioUrl: string;
+  coverUrl?: string;
   duration: string;
   episodeNum: string;
 }
@@ -125,11 +126,15 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
           transition={{ duration: 0.6 }}
           className="glass-panel w-full rounded-3xl p-6 md:p-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 relative overflow-hidden"
         >
-          <div className="relative w-44 h-44 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#22d3ee] flex items-center justify-center flex-shrink-0 shadow-2xl shadow-[#6366f1]/20 border border-white/10 group">
+          <div className="relative w-44 h-44 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#22d3ee] flex items-center justify-center flex-shrink-0 shadow-2xl shadow-[#6366f1]/20 border border-white/10 overflow-hidden group">
+            {episode.coverUrl ? (
+              <img src={episode.coverUrl} alt={episode.titleEn} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            ) : (
+              <Headphones className="w-20 h-20 text-white/90 group-hover:scale-110 transition-transform duration-500" />
+            )}
             <span className="font-mono text-xs font-black text-[#f59e0b] absolute top-3 left-3 bg-black/65 px-2.5 py-1 rounded-lg">EP {episode.episodeNum}</span>
-            <Headphones className="w-20 h-20 text-white/90 group-hover:scale-110 transition-transform duration-500" />
             
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <button 
                 onClick={togglePlay}
                 className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition"

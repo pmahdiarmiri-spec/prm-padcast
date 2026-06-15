@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { titleFa, titleEn, descFa, descEn, audioUrl, duration, episodeNum } = body;
+    const { titleFa, titleEn, descFa, descEn, audioUrl, coverUrl, duration, episodeNum } = body;
 
     const newEpisode = await prisma.episode.create({
       data: {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
         descFa,
         descEn,
         audioUrl,
+        coverUrl: coverUrl || "",
         duration,
       },
     });

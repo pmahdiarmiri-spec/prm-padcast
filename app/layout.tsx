@@ -22,8 +22,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PRM Podcast | هوش مصنوعی، تکنولوژی و بیزینس بین‌الملل",
-  description: "رسانه تخصصی پادکست PRM - ادغام هوش مصنوعی، مهندسی نرم‌افزار، زبان تخصصی و تجارت بین‌الملل",
+  title: "PRM Podcast | رسانه مهندسی نرم‌افزار، هوش مصنوعی و تجارت هوشمند",
+  description: "رسانه تخصصی پادکست PRM - بستر اشتراک دانش، کالبدشکافی عملی معماری‌های نرم‌افزاری و پیاده‌سازی هوش مصنوعی مولد در پروداکشن.",
 };
 
 export default function RootLayout({

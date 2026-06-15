@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles } from "lucide-react";
+import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Activity, Layers, Rocket } from "lucide-react";
 import Footer from "@/components/Footer";
 
 interface Episode {
@@ -128,7 +128,7 @@ export default function Home() {
   };
 
   return (
-    <main dir={isRtl ? "rtl" : "ltr"} className={`relative min-h-screen flex flex-col justify-between p-4 md:p-8 z-10 ${lang === "en" ? "font-inter" : "font-vazirmatn"}`}>
+    <main dir={isRtl ? "rtl" : "ltr"} className={`relative min-h-screen flex flex-col justify-between p-4 md:p-8 z-10 overflow-x-hidden ${lang === "en" ? "font-inter" : "font-vazirmatn"}`}>
       
       {currentEpisode && (
         <audio
@@ -181,45 +181,45 @@ export default function Home() {
         className={`relative z-10 w-full max-w-5xl mx-auto my-14 flex flex-col gap-10 ${isRtl ? "items-start text-right" : "items-start text-left"}`}
       >
         <motion.div variants={itemVariants} className="flex items-center gap-2.5">
-          <span className="w-2 h-2 rounded-full bg-[#22d3ee] pulse-gold-dot" />
+          <span className="w-2 h-2 rounded-full bg-[#22d3ee] pulse-cyan-dot" />
           <span className="font-mono text-xs font-extrabold tracking-widest text-[#22d3ee] uppercase">
-            {isRtl ? "جامعه باز توسعه‌دهندگان و فناوران تجارت" : "OPEN COMMUNITY OF TRADE-TECH DEVELOPERS"}
+            {isRtl ? "جامعه باز توسعه‌دهندگان، مهندسان نرم‌افزار و متخصصان هوش مصنوعی" : "OPEN COMMUNITY FOR DEVELOPERS, ENGINEERS & AI SPECIALISTS"}
           </span>
         </motion.div>
 
         <motion.div variants={itemVariants} className="flex flex-col gap-5 w-full">
           <h1 className="text-4xl md:text-7xl font-black tracking-tight text-white leading-[1.15]">
-            {isRtl ? "تلاقی مهندسی نرم‌افزار،" : "Where Code Meets"} <br />
+            {isRtl ? "کالبدشکافی عمیق مهندسی" : "Deep Dissection of"} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] via-[#a78bfa] to-[#22d3ee]">
-              {isRtl ? "هوش مصنوعی و بازار جهانی" : "Global Trade Intelligence"}
+              {isRtl ? "نرم‌افزار و هوش مصنوعی مولد" : "Software Engineering & Production AI"}
             </span>
           </h1>
           <p className="text-slate-400 text-base md:text-lg font-medium max-w-3xl leading-relaxed">
             {isRtl 
-              ? "رسانه‌ای تخصصی و تعاملی برای اشتراک‌گذاری تجربیات واقعی توسعه سیستم‌های توزیع‌شده، پیاده‌سازی هوش تجاری (BI) و بکارگیری مدل‌های زبانی در پروداکشن." 
-              : "A specialized interactive media sharing hands-on experience in building distributed systems, trade intelligence, and production-ready AI."}
+              ? "فضایی کاملاً فنی و بدون سانسور برای انتقال تجارب واقعی در پیاده‌سازی سیستم‌های توزیع‌شده مقیاس‌پذیر، پردازش کلان‌داده، مهندسی پرامپت و اجرای مدل‌های هوش مصنوعی در پروداکشن." 
+              : "A purely technical, uncensored environment for sharing real-world experiences in scaling distributed systems, processing big data, and deploying production-ready AI models."}
           </p>
         </motion.div>
 
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
           <div className={`glass-card p-4 rounded-xl flex items-center justify-between ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
             <div className={isRtl ? "text-right" : "text-left"}>
-              <div className="text-lg font-black text-white font-mono">4.2M+</div>
-              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "آنالیز کلان‌داده گمرکی" : "Customs Big Data"}</div>
+              <div className="text-lg font-black text-white font-mono">Real Cases</div>
+              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "کالبدشکافی پروژه‌ها" : "Dissecting Production"}</div>
             </div>
-            <Database className="w-5 h-5 text-[#6366f1]" />
+            <Terminal className="w-5 h-5 text-[#6366f1]" />
           </div>
           <div className={`glass-card p-4 rounded-xl flex items-center justify-between ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
             <div className={isRtl ? "text-right" : "text-left"}>
-              <div className="text-lg font-black text-white font-mono">LLM-Driven</div>
-              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "هوش مصنوعی اختصاصی" : "Proprietary AI"}</div>
+              <div className="text-lg font-black text-white font-mono">LLM & BI</div>
+              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "هوش تجاری هوشمند" : "Agentic AI & Analytics"}</div>
             </div>
             <Sparkles className="w-5 h-5 text-[#a78bfa]" />
           </div>
           <div className={`glass-card p-4 rounded-xl flex items-center justify-between ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
             <div className={isRtl ? "text-right" : "text-left"}>
-              <div className="text-lg font-black text-white font-mono">Open Dev</div>
-              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "پلتفرم اشتراکی آینده" : "Future Shared Space"}</div>
+              <div className="text-lg font-black text-white font-mono">Open Platform</div>
+              <div className="text-xs text-slate-500 mt-0.5">{isRtl ? "بستر اشتراک دانش" : "Knowledge Base"}</div>
             </div>
             <Users className="w-5 h-5 text-[#22d3ee]" />
           </div>
@@ -241,7 +241,7 @@ export default function Home() {
             <span>{isRtl ? "شنیدن آخرین اپیزود" : "Listen Latest Episode"}</span>
           </button>
           <a href="#case-study" className="glass-card px-6 py-3.5 rounded-xl text-white font-bold text-sm flex items-center gap-2 hover:border-white/10 active:scale-95">
-            <span>{isRtl ? "بررسی معماری آتریانا" : "Atriana Case Study"}</span>
+            <span>{isRtl ? "کیس‌استادی معماری آتریانا" : "Case Study: Atriana"}</span>
             <ArrowUpRight className="w-4 h-4 text-slate-400" />
           </a>
         </motion.div>
@@ -255,8 +255,8 @@ export default function Home() {
             </h3>
             <p className="text-sm text-slate-400 leading-relaxed">
               {isRtl 
-                ? "دسترسی مستقیم و بومی به تمامی قسمت‌های پادکست. برای پخش فیزیکی هر قسمت به صورت آنلاین روی دکمه پخش کلیک کنید." 
-                : "Direct access to all published episodes. Click and listen to any episode directly on our proprietary player."}
+                ? "دسترسی مستقیم و بدون واسطه به تمامی محتواهای صوتی پادکست، ضبط شده با تکیه بر چالش‌های فنی دنیای پروداکشن." 
+                : "Direct, uninterrupted access to all podcast episodes built and structured around pure, production-grade technical challenges."}
             </p>
           </div>
         </div>
@@ -314,16 +314,16 @@ export default function Home() {
         <div className={`flex flex-col md:flex-row justify-between items-start gap-8 mb-10 ${isRtl ? "text-right" : "text-left"}`}>
           <div className="max-w-2xl">
             <h3 className="text-2xl font-black text-white mb-3">
-              {isRtl ? "مطالعه موردی: پلتفرم هوشمند آتریانا" : "Case Study: Atriana Intelligent Platform"}
+              {isRtl ? "مطالعه موردی: کالبدشکافی مهندسی پلتفرم آتریانا" : "Case Study: Dissecting Atriana Architecture"}
             </h3>
             <p className="text-sm text-slate-400 leading-relaxed">
               {isRtl 
-                ? "چگونه یک پلتفرم یکپارچه تجارت بین‌الملل با استفاده از معماری نوین داده، سیستم‌های تصمیم‌یار هوشمند و هوش مصنوعی مولد ساخته شد؟ در پادکست PRM، چالش‌های مهندسی این پروژه واقعی را کالبدشکافی می‌کنیم." 
-                : "How a unified global trade tech platform was built using modern data pipelines, expert decision systems, and generative AI. We dissect these production challenges."}
+                ? "آتریانا (پلتفرم یکپارچه تجارت بین‌الملل) بزرگ‌ترین آزمایشگاه و سند اثبات کار ماست. در این مجموعه اپیزودها، تمام چالش‌ها و چگونگی توسعه تنهای این سیستم پیچیده در ۶ ماه را مرور می‌کنیم." 
+                : "Atriana (the unified trade-tech platform) serves as our live testbed. In this series, we dissect how this complex architecture was engineered single-handedly in 6 months."}
             </p>
           </div>
           <span className="font-mono text-[10px] text-[#22d3ee] bg-[#22d3ee]/8 border border-[#22d3ee]/10 px-3 py-1.5 rounded-lg font-black tracking-wider self-start">
-            PRODUCTION ARCHITECTURE
+            SEASON 1 LAB CASE STUDY
           </span>
         </div>
 
@@ -337,11 +337,11 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-[#6366f1]/10 flex items-center justify-center border border-[#6366f1]/10">
               <Database className="w-5 h-5 text-[#6366f1]" />
             </div>
-            <h4 className="text-base font-extrabold text-white">{isRtl ? "تحلیل داده‌های کلان تجاری" : "Big Data Processing"}</h4>
+            <h4 className="text-base font-extrabold text-white">{isRtl ? "پردازش کلان‌داده و مصورسازی پویا" : "Big Data Pipeline & BI"}</h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isRtl 
-                ? "پردازش کدهای تعرفه گمرکی (HS Code)، مصورسازی روندهای دلاری/ریالی/وزنی، نقشه پویای تجاری جهان و ایران و مقایسه داده‌های آماری فصول سال." 
-                : "Processing HS codes, visualising dollar/weight trends, building dynamic trade maps, and comparative seasonal analysis."}
+                ? "پایپ‌لاین پردازش ۴.۲ میلیون رکورد تعرفه گمرکی (HS Code) صادرتی/وارداتی و نمایش داشبوردهای عمیق آماری به کمک بصری‌سازی پیشرفته چندبعدی." 
+                : "Processing 4.2M customs big data records (HS Codes) with dynamic, multidimensional analytics dashboards and geographical mapping."}
             </p>
           </motion.div>
 
@@ -355,11 +355,11 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-[#a78bfa]/10 flex items-center justify-center border border-[#a78bfa]/10">
               <Cpu className="w-5 h-5 text-[#a78bfa]" />
             </div>
-            <h4 className="text-base font-extrabold text-white">{isRtl ? "موتور استراتژی AHP و هوش تجاری" : "AHP Strategy Engine & BI"}</h4>
+            <h4 className="text-base font-extrabold text-white">{isRtl ? "پیاده‌سازی الگوریتم AHP و AI" : "Decision Analytics & Generative AI"}</h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isRtl 
-                ? "پیاده‌سازی فرآیند تحلیل سلسله مراتبی (AHP) برای تعیین استراتژی ورود به بازار، ادغام‌شده با چت‌بات‌های اختصاصی تحلیل دیتابیس." 
-                : "Implementing Analytic Hierarchy Process for market entry decisions, integrated with proprietary DB-connected analytical chatbots."}
+                ? "توسعه موتور تصمیم‌یار تحلیل سلسله مراتبی (AHP) جهت شناسایی استراتژی ورود به بازارهای بین‌المللی متصل به دستیار صوتی و متنی هوشمند اختصاصی." 
+                : "Implementing Analytic Hierarchy Process decision algorithms with DB-integrated, business intelligence-driven custom LLMs."}
             </p>
           </motion.div>
 
@@ -373,11 +373,11 @@ export default function Home() {
             <div className="w-10 h-10 rounded-xl bg-[#22d3ee]/10 flex items-center justify-center border border-[#22d3ee]/10">
               <Code2 className="w-5 h-5 text-[#22d3ee]" />
             </div>
-            <h4 className="text-base font-extrabold text-white">{isRtl ? "ارتباطات و ساختار تعاملی" : "Realtime Communications"}</h4>
+            <h4 className="text-base font-extrabold text-white">{isRtl ? "موتورهای بلادرنگ و ترجمه همزمان" : "Realtime Translation Engine"}</h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               {isRtl 
-                ? "مکانیزم پیام‌رسان داخلی مجهز به ترجمه زنده و آنی فارسی/انگلیسی، پروفایل‌های سازمانی چند لایه و مدیریت هوشمند جلسات مذاکره تجاری." 
-                : "Realtime messaging with in-app Persian/English translation, comprehensive corporate profiles, and smart online meeting flows."}
+                ? "معماری ارتباطات زنده پیام‌رسان درون‌برنامه‌ای چندزبانه همراه با مکانیزم ترجمه متقارن فارسی به انگلیسی با زمان تأخیر بسیار پایین." 
+                : "Engineering realtime chats with end-to-end multi-layered business profiles and instant, low-latency Persian/English translators."}
             </p>
           </motion.div>
         </div>
@@ -399,7 +399,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className={`flex items-center gap-2 ${isRtl ? "flex-row" : "flex-row-reverse"}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] pulse-gold-dot" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] pulse-cyan-dot" />
                     <h4 className="text-sm md:text-base font-extrabold text-white line-clamp-1">
                       {isRtl ? currentEpisode.titleFa : currentEpisode.titleEn}
                     </h4>

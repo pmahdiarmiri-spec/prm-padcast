@@ -75,7 +75,7 @@ body {
   box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
 }
 
-@keyframes pulse-gold {
+@keyframes pulse-cyan {
   0%, 100% {
     transform: scale(1);
     opacity: 0.9;
@@ -88,8 +88,8 @@ body {
   }
 }
 
-.pulse-gold-dot {
-  animation: pulse-gold 2s infinite ease-in-out;
+.pulse-cyan-dot {
+  animation: pulse-cyan 2s infinite ease-in-out;
 }
 
 @keyframes wave {

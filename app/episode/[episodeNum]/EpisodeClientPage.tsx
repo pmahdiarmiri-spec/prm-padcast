@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Share2, Clock, Headphones, RotateCcw, RotateCw, AlertTriangle, ShieldCheck, X } from "lucide-react";
+import { Play, Pause, Share2, Clock, Headphones, RotateCcw, RotateCw, AlertTriangle, ShieldCheck, X, Layers } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+
+interface Season {
+  seasonNum: string;
+  titleFa: string;
+  titleEn: string;
+  isCompleted: boolean;
+}
 
 interface Episode {
   id: string;
@@ -16,6 +23,7 @@ interface Episode {
   coverUrl?: string;
   duration: string;
   episodeNum: string;
+  season?: Season | null;
 }
 
 export default function EpisodeClientPage({ episode }: { episode: Episode }) {
@@ -190,6 +198,18 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
               <span className="font-mono text-xs bg-[#6366f1]/10 text-[#6366f1] px-3 py-1.5 rounded-lg font-black border border-[#6366f1]/10">
                 EPISODE {episode.episodeNum}
               </span>
+              {episode.season && (
+                <div className="flex items-center gap-1 bg-[#22d3ee]/10 text-[#22d3ee] px-3 py-1.5 rounded-lg text-xs font-black border border-[#22d3ee]/10">
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>{isRtl ? `فصل ${episode.season.seasonNum}` : `SEASON ${episode.season.seasonNum}`}</span>
+                  <span className="mx-1 text-white/20">|</span>
+                  <span className="text-[10px] opacity-90">
+                    {episode.season.isCompleted 
+                      ? (isRtl ? "پایان یافته" : "COMPLETED") 
+                      : (isRtl ? "در حال انتشار" : "ONGOING")}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-1.5 bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg text-xs text-slate-400">
                 <Clock className="w-3.5 h-3.5" />
                 <span className="font-mono">{episode.duration}</span>

@@ -42,6 +42,9 @@ export default async function EpisodePage({ params }: Props) {
   const resolvedParams = await params;
   const episode = await prisma.episode.findUnique({
     where: { episodeNum: resolvedParams.episodeNum },
+    include: {
+      season: true,
+    }
   });
 
   if (!episode) {
@@ -58,6 +61,12 @@ export default async function EpisodePage({ params }: Props) {
     audioUrl: episode.audioUrl,
     coverUrl: episode.coverUrl || "",
     duration: episode.duration,
+    season: episode.season ? {
+      seasonNum: episode.season.seasonNum,
+      titleFa: episode.season.titleFa,
+      titleEn: episode.season.titleEn,
+      isCompleted: episode.season.isCompleted,
+    } : null,
   };
 
   return <EpisodeClientPage episode={plainEpisode} />;

@@ -12,6 +12,9 @@ export async function GET(request: Request) {
 
     const episodes = await prisma.episode.findMany({
       where: { userId: Number(userId) },
+      include: {
+        season: true,
+      },
       orderBy: { id: "desc" },
     });
 

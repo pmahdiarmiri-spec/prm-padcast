@@ -15,6 +15,19 @@ model User {
   bio       String?
   createdAt DateTime  @default(now())
   episodes  Episode[]
+  seasons   Season[]
+}
+
+model Season {
+  id          Int       @id @default(autoincrement())
+  seasonNum   String    @unique
+  titleFa     String
+  titleEn     String
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  episodes    Episode[]
 }
 
 model Episode {
@@ -31,6 +44,8 @@ model Episode {
   createdAt   DateTime @default(now())
   userId      Int?
   user        User?    @relation(fields: [userId], references: [id])
+  seasonId    Int?
+  season      Season?  @relation(fields: [seasonId], references: [id])
   reports     Report[]
 }
 

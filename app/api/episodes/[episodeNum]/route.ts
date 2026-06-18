@@ -9,6 +9,9 @@ export async function GET(
     const { episodeNum } = params;
     const episode = await prisma.episode.findUnique({
       where: { episodeNum: String(episodeNum) },
+      include: {
+        season: true,
+      },
     });
 
     if (!episode) {

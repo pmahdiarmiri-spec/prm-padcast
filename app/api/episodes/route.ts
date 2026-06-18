@@ -10,6 +10,7 @@ export async function GET(request: Request) {
       where: isAdmin ? {} : { status: "published" },
       include: {
         reports: true,
+        season: true,
       },
       orderBy: { id: "desc" },
     });
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { id, action, titleFa, titleEn, descFa, descEn, audioUrl, coverUrl, duration, episodeNum, userId } = body;
+    const { id, action, titleFa, titleEn, descFa, descEn, audioUrl, coverUrl, duration, episodeNum, userId, seasonId } = body;
 
     if (action && id) {
       if (action === "approve") {
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
         duration: duration || "",
         episodeNum: String(episodeNum),
         userId: Number(userId),
+        seasonId: seasonId ? Number(seasonId) : null,
       },
     });
 

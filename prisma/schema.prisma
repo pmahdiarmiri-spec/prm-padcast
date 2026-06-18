@@ -1,21 +1,46 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  fullName  String
+  field     String
+  bio       String?
+  createdAt DateTime  @default(now())
+  episodes  Episode[]
+}
+
 model Episode {
-  id         Int      @id @default(autoincrement())
-  episodeNum String   @unique
-  titleFa    String
-  titleEn    String
-  descFa     String
-  descEn     String
-  audioUrl   String
-  coverUrl   String?  @default("")
-  duration   String
-  createdAt  DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  titleFa     String
+  titleEn     String
+  descFa      String
+  descEn      String
+  audioUrl    String
+  coverUrl    String
+  duration    String
+  episodeNum  String   @unique
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+  reports     Report[]
+}
+
+model Report {
+  id        Int      @id @default(autoincrement())
+  ipAddress String
+  reason    String
+  createdAt DateTime @default(now())
+  episodeId Int
+  episode   Episode  @relation(fields: [episodeId], references: [id])
+
+  @@unique([ipAddress, episodeId])
 }

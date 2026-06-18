@@ -25,6 +25,7 @@
   --text-primary: #f3f4f6;
   --text-muted: #9ca3af;
   --text-subtle: #4b5563;
+  scroll-behavior: smooth;
 }
 
 body {

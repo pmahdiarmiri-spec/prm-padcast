@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Share2, Clock, Headphones, RotateCcw, RotateCw } from "lucide-react";
-import { motion } from "framer-motion";
+import { Play, Pause, Share2, Clock, Headphones, RotateCcw, RotateCw, AlertTriangle, ShieldCheck, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
@@ -22,13 +22,23 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
   const [lang, setLang] = useState<"fa" | "en">("fa");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [reported, setReported] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("Copyright");
+  const [reportDetails, setReportDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("prm_lang") as "fa" | "en" | null;
     if (savedLang) setLang(savedLang);
-  }, []);
+
+    const reports = JSON.parse(localStorage.getItem("prm_reported_episodes") || "[]");
+    if (reports.includes(episode.episodeNum)) {
+      setReported(true);
+    }
+  }, [episode.episodeNum]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -98,6 +108,37 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert(lang === "fa" ? "لینک اپیزود کپی شد." : "Link copied to clipboard.");
+    }
+  };
+
+  const reportEpisode = async () => {
+    if (reported || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          episodeNum: episode.episodeNum,
+          reason: reportReason,
+          details: reportDetails
+        }),
+      });
+      if (res.ok) {
+        setReported(true);
+        const reports = JSON.parse(localStorage.getItem("prm_reported_episodes") || "[]");
+        reports.push(episode.episodeNum);
+        localStorage.setItem("prm_reported_episodes", JSON.stringify(reports));
+        setIsReportModalOpen(false);
+        alert(lang === "fa" ? "گزارش شما ثبت شد. با تشکر از نظارت شما." : "Report submitted. Thank you for moderating.");
+      } else {
+        const errData = await res.json();
+        alert(errData.error || "Error reporting episode");
+      }
+    } catch {
+      alert("Error submitting report");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -178,6 +219,19 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
               >
                 <Share2 className="w-4 h-4" />
               </button>
+
+              <button 
+                onClick={() => reported ? null : setIsReportModalOpen(true)}
+                disabled={reported}
+                className={`p-3.5 rounded-xl border flex items-center justify-center gap-2 transition duration-300 active:scale-95 text-xs font-bold ${
+                  reported 
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                    : "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20"
+                }`}
+              >
+                {reported ? <ShieldCheck className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                <span>{reported ? (isRtl ? "گزارش شد" : "Reported") : (isRtl ? "گزارش تخلف" : "Report Abuse")}</span>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -243,6 +297,65 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
           </div>
         </motion.div>
       </section>
+
+      <AnimatePresence>
+        {isReportModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-8 border border-white/10 flex flex-col gap-5 relative text-right"
+              dir={isRtl ? "rtl" : "ltr"}
+            >
+              <button 
+                onClick={() => setIsReportModalOpen(false)}
+                className={`absolute top-4 ${isRtl ? "left-4" : "right-4"} p-2 rounded-full hover:bg-white/5 text-slate-400 hover:text-white`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                <span>{isRtl ? "ثبت گزارش تخلف اپیزود" : "Submit Episode Report"}</span>
+              </h3>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs text-slate-400 font-bold">{isRtl ? "علت اصلی تخلف:" : "Main Reason:"}</label>
+                <select 
+                  value={reportReason} 
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full bg-slate-900/80 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-[#6366f1]"
+                >
+                  <option value="Copyright">{isRtl ? "نقض کپی‌رایت / مالکیت معنوی" : "Copyright Infringement"}</option>
+                  <option value="Inappropriate Content">{isRtl ? "محتوای غیراخلاقی یا نامناسب" : "Inappropriate Content"}</option>
+                  <option value="Spam">{isRtl ? "اسپم یا تبلیغات کاذب" : "Spam or Advertising"}</option>
+                  <option value="Other">{isRtl ? "سایر موارد" : "Other Reasons"}</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs text-slate-400 font-bold">{isRtl ? "توضیحات تکمیلی برای ادمین (اختیاری):" : "Additional details (Optional):"}</label>
+                <textarea 
+                  rows={4}
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  placeholder={isRtl ? "جزئیات بیشتری برای پیگیری ادمین وارد کنید..." : "Provide details for the moderator..."}
+                  className="w-full bg-slate-900/80 border border-white/10 rounded-xl p-3 text-white text-xs outline-none focus:border-[#6366f1] resize-none"
+                />
+              </div>
+
+              <button 
+                onClick={reportEpisode}
+                disabled={isSubmitting}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold text-xs shadow-lg shadow-red-500/15 hover:shadow-red-500/25 transition disabled:opacity-50"
+              >
+                {isSubmitting ? (isRtl ? "در حال ثبت..." : "Submitting...") : (isRtl ? "ارسال گزارش نهایی" : "Submit Report")}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <Footer lang={lang} />
     </main>

@@ -2,178 +2,59 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ShieldCheck, CheckCircle2, Trash2, AlertOctagon } from "lucide-react";
 
 export default function AdminPortal() {
   const router = useRouter();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [passwordInput, setPasswordInput] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUploading, setImageUploading] = useState(false);
-  const [imageUploadProgress, setImageUploadProgress] = useState(0);
-  const [publishing, setPublishing] = useState(false);
-  const [publishProgress, setPublishProgress] = useState(0);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [form, setForm] = useState({
-    titleFa: "",
-    titleEn: "",
-    descFa: "",
-    descEn: "",
-    audioUrl: "",
-    coverUrl: "",
-    duration: "",
-    episodeNum: "",
-  });
+  const [suspendedEpisodes, setSuspendedEpisodes] = useState<any[]>([]);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("admin_token");
     if (savedToken) {
       setAuthToken(savedToken);
+      fetchSuspended(savedToken);
     }
   }, []);
+
+  const fetchSuspended = async (token: string) => {
+    try {
+      const res = await fetch("/api/episodes?admin=true");
+      if (res.ok) {
+        const data = await res.json();
+        const suspended = data.filter((ep: any) => ep.status === "suspended" || (ep.reports && ep.reports.length > 0));
+        setSuspendedEpisodes(suspended);
+      }
+    } catch {}
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("admin_token", passwordInput);
     setAuthToken(passwordInput);
+    fetchSuspended(passwordInput);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    setAuthToken(null);
-  };
-
-  const handleFileUpload = () => {
-    if (!audioFile || !authToken) return;
-    setUploading(true);
-    setUploadProgress(0);
-
-    const formData = new FormData();
-    formData.append("file", audioFile);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload", true);
-    xhr.setRequestHeader("Authorization", authToken);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        setUploadProgress(percentComplete);
-      }
-    };
-
-    xhr.onload = () => {
-      setUploading(false);
-      try {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 200) {
-          setForm((prev) => ({ ...prev, audioUrl: response.url }));
-          alert("فایل صوتی با موفقیت آپلود شد.");
-        } else {
-          alert(`خطا در آپلود: ${response.error || "نامشخص"}`);
-        }
-      } catch {
-        alert("خطای سرور: مسیر API پیدا نشد یا پاسخ HTML است.");
-      }
-    };
-
-    xhr.onerror = () => {
-      setUploading(false);
-      alert("ارتباط با سرور برقرار نشد.");
-    };
-
-    xhr.send(formData);
-  };
-
-  const handleImageUpload = () => {
-    if (!imageFile || !authToken) return;
-    setImageUploading(true);
-    setImageUploadProgress(0);
-
-    const formData = new FormData();
-    formData.append("file", imageFile);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload", true);
-    xhr.setRequestHeader("Authorization", authToken);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        setImageUploadProgress(percentComplete);
-      }
-    };
-
-    xhr.onload = () => {
-      setImageUploading(false);
-      try {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 200) {
-          setForm((prev) => ({ ...prev, coverUrl: response.url }));
-          alert("تصویر کاور با موفقیت آپلود شد.");
-        } else {
-          alert(`خطا در آپلود تصویر: ${response.error || "نامشخص"}`);
-        }
-      } catch {
-        alert("خطای سرور در آپلود تصویر.");
-      }
-    };
-
-    xhr.onerror = () => {
-      setImageUploading(false);
-      alert("ارتباط با سرور برقرار نشد.");
-    };
-
-    xhr.send(formData);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAction = async (id: number, action: "approve" | "delete") => {
     if (!authToken) return;
+    try {
+      const res = await fetch("/api/episodes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": authToken,
+        },
+        body: JSON.stringify({ id, action }),
+      });
 
-    if (!form.audioUrl) {
-      alert("ابتدا باید فایل صوتی را آپلود کنید.");
-      return;
+      if (res.ok) {
+        alert("Action processed successfully.");
+        fetchSuspended(authToken);
+      }
+    } catch {
+      alert("Error processing action.");
     }
-
-    setPublishing(true);
-    setPublishProgress(0);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/episodes", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Authorization", authToken);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        setPublishProgress(percentComplete);
-      }
-    };
-
-    xhr.onload = () => {
-      setPublishing(false);
-      try {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 200) {
-          alert("اپیزود با موفقیت ذخیره شد");
-          router.push("/");
-        } else {
-          alert(`خطا در ذخیره‌سازی: ${response.error || "نامشخص"}`);
-        }
-      } catch {
-        console.error("Server Response:", xhr.responseText);
-        alert(`خطای ناخواسته سرور رخ داد. وضعیت: ${xhr.status}. برای مشاهده متن خطا Console مرورگر را بررسی کنید.`);
-      }
-    };
-
-    xhr.onerror = () => {
-      setPublishing(false);
-      alert("ارتباط با سرور برقرار نشد.");
-    };
-
-    xhr.send(JSON.stringify(form));
   };
 
   if (!authToken) {
@@ -199,191 +80,64 @@ export default function AdminPortal() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative gap-6">
-      <div className="w-full max-w-2xl flex justify-between items-center" dir="rtl">
+      <div className="w-full max-w-4xl flex justify-between items-center" dir="rtl">
         <span className="text-white/60 text-xs font-mono">Token: Authenticated</span>
-        <button onClick={handleLogout} className="text-xs text-red-400 hover:underline">خروج از پنل</button>
+        <button onClick={() => { localStorage.removeItem("admin_token"); setAuthToken(null); }} className="text-xs text-red-400 hover:underline">خروج از پنل</button>
       </div>
 
-      <div className="glass-panel w-full max-w-2xl rounded-3xl p-8 flex flex-col gap-6 text-right" dir="rtl">
-        <h2 className="text-2xl font-black text-white">بارگذاری فیزیکی پادکست</h2>
-        
-        <div className="flex flex-col gap-4 bg-[#0d1117] p-5 rounded-2xl border border-white/5">
-          <span className="text-xs text-slate-400 font-bold">انتخاب فایل صوتی اپیزود (MP3/WAV/M4A)</span>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="file"
-              accept="audio/*"
-              className="flex-1 text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#6366f1]/10 file:text-[#6366f1] hover:file:bg-[#6366f1]/20 file:cursor-pointer"
-              onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
-            />
-            <button
-              type="button"
-              disabled={uploading || !audioFile}
-              onClick={handleFileUpload}
-              className="px-6 py-2.5 rounded-xl bg-[#6366f1] hover:bg-[#6366f1]/95 text-white text-xs font-bold disabled:opacity-50 transition-all"
-            >
-              {uploading ? "در حال ارسال..." : "شروع آپلود فیزیکی"}
-            </button>
-          </div>
-
-          {uploading && (
-            <div className="w-full mt-2">
-              <div className="flex justify-between text-xs text-slate-400 mb-1 font-mono">
-                <span>{uploadProgress}%</span>
-                <span>در حال آپلود فایل صوتی روی سرور</span>
-              </div>
-              <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-[#6366f1] to-[#a78bfa] h-full transition-all duration-150 rounded-full" 
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {form.audioUrl && (
-            <span className="text-xs text-emerald-400 font-mono mt-1" dir="ltr">
-              Audio Path: {form.audioUrl}
-            </span>
-          )}
+      <div className="glass-panel w-full max-w-4xl rounded-3xl p-8 flex flex-col gap-6 text-right animate-fade-in" dir="rtl">
+        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+          <ShieldCheck className="w-6 h-6 text-[#22d3ee]" />
+          <h2 className="text-xl font-black text-white">مدیریت پادکست‌های معلق و گزارشات تخلف</h2>
         </div>
 
-        <div className="flex flex-col gap-4 bg-[#0d1117] p-5 rounded-2xl border border-white/5">
-          <span className="text-xs text-slate-400 font-bold">انتخاب کاور اپیزود (مربع - مثلاً 1400x1400)</span>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="file"
-              accept="image/*"
-              className="flex-1 text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#22d3ee]/10 file:text-[#22d3ee] hover:file:bg-[#22d3ee]/20 file:cursor-pointer"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-            />
-            <button
-              type="button"
-              disabled={imageUploading || !imageFile}
-              onClick={handleImageUpload}
-              className="px-6 py-2.5 rounded-xl bg-[#22d3ee] hover:bg-[#22d3ee]/95 text-slate-950 text-xs font-bold disabled:opacity-50 transition-all"
-            >
-              {imageUploading ? "در حال ارسال..." : "آپلود کاور"}
-            </button>
-          </div>
+        <div className="flex flex-col gap-4">
+          {suspendedEpisodes.length === 0 ? (
+            <p className="text-xs text-slate-400 text-center py-10">هیچ پادکستی با گزارش تخلف ثبت نشده است.</p>
+          ) : (
+            suspendedEpisodes.map((ep) => (
+              <div key={ep.id} className="flex flex-col bg-[#0d1117]/80 p-5 rounded-2xl border border-white/5 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <AlertOctagon className="w-4 h-4 text-red-400 animate-pulse" />
+                      <span className="text-white text-xs font-bold">{ep.titleFa}</span>
+                      <span className="text-[10px] bg-red-500/10 text-red-400 border border-red-500/10 p-0.5 px-1.5 rounded">
+                        تعداد گزارشات: {ep.reports?.length || 0}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono">ID: {ep.episodeNum} | URL: {ep.audioUrl}</span>
+                  </div>
 
-          {imageUploading && (
-            <div className="w-full mt-2">
-              <div className="flex justify-between text-xs text-slate-400 mb-1 font-mono">
-                <span>{imageUploadProgress}%</span>
-                <span>در حال آپلود تصویر کاور روی سرور</span>
-              </div>
-              <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-[#22d3ee] to-[#a78bfa] h-full transition-all duration-150 rounded-full" 
-                  style={{ width: `${imageUploadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleAction(ep.id, "approve")} className="flex items-center gap-1.5 p-2 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>تایید مجدد انتشار</span>
+                    </button>
+                    <button onClick={() => handleAction(ep.id, "delete")} className="flex items-center gap-1.5 p-2 px-4 rounded-xl bg-red-500/10 border border-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-bold transition">
+                      <Trash2 className="w-4 h-4" />
+                      <span>حذف قطعی</span>
+                    </button>
+                  </div>
+                </div>
 
-          {form.coverUrl && (
-            <div className="flex items-center gap-4 mt-2">
-              <img src={form.coverUrl} alt="Cover Preview" className="w-16 h-16 rounded-xl object-cover border border-white/10" />
-              <span className="text-xs text-emerald-400 font-mono" dir="ltr">
-                Cover Path: {form.coverUrl}
-              </span>
-            </div>
+                {ep.reports && ep.reports.length > 0 && (
+                  <div className="w-full mt-2 border-t border-white/5 pt-3 flex flex-col gap-2">
+                    <span className="text-xs font-bold text-slate-400">علت گزارشات ثبت شده:</span>
+                    <div className="grid grid-cols-1 gap-2">
+                      {ep.reports.map((rep: any) => (
+                        <div key={rep.id} className="text-[11px] bg-white/5 p-2.5 rounded-lg border border-white/5 text-slate-300">
+                          <span className="font-mono text-slate-500 text-[10px] block mb-1">IP: {rep.ipAddress}</span>
+                          {rep.reason}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="عنوان فارسی"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none"
-              value={form.titleFa}
-              onChange={(e) => setForm({ ...form, titleFa: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              placeholder="English Title"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none text-left font-mono"
-              value={form.titleEn}
-              onChange={(e) => setForm({ ...form, titleEn: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <textarea
-              placeholder="توضیحات فارسی"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none h-28 resize-none"
-              value={form.descFa}
-              onChange={(e) => setForm({ ...form, descFa: e.target.value })}
-              required
-            />
-            <textarea
-              placeholder="English Description"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none h-28 text-left font-mono resize-none"
-              value={form.descEn}
-              onChange={(e) => setForm({ ...form, descEn: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input
-              type="text"
-              placeholder="شماره اپیزود (مثلا: 01)"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none text-center font-mono"
-              value={form.episodeNum}
-              onChange={(e) => setForm({ ...form, episodeNum: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              placeholder="مدت زمان (مثلا: 38:15)"
-              className="w-full bg-[#0d1117] border border-white/10 rounded-xl p-3 text-white focus:border-[#6366f1] outline-none text-center font-mono"
-              value={form.duration}
-              onChange={(e) => setForm({ ...form, duration: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              placeholder="مسیر فایل"
-              className="w-full bg-[#0d1117]/50 border border-white/10 rounded-xl p-3 text-white outline-none text-center font-mono text-xs"
-              value={form.audioUrl}
-              onChange={(e) => setForm({ ...form, audioUrl: e.target.value })}
-              required
-              readOnly
-            />
-            <input
-              type="text"
-              placeholder="مسیر کاور"
-              className="w-full bg-[#0d1117]/50 border border-white/10 rounded-xl p-3 text-white outline-none text-center font-mono text-xs"
-              value={form.coverUrl}
-              onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
-              readOnly
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            disabled={publishing}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-[#6366f1] to-[#a78bfa] text-white font-bold text-sm hover:shadow-lg hover:shadow-[#6366f1]/25 transition-all disabled:opacity-50 relative overflow-hidden"
-          >
-            {publishing ? (
-              <span className="relative z-10">در حال انتقال و ذخیره اطلاعات ({publishProgress}%)</span>
-            ) : (
-              <span className="relative z-10">انتشار رسمی اپیزود در کل سایت</span>
-            )}
-            
-            {publishing && (
-              <div 
-                className="absolute left-0 top-0 h-full bg-white/20 transition-all duration-150"
-                style={{ width: `${publishProgress}%` }}
-              />
-            )}
-          </button>
-        </form>
       </div>
     </div>
   );

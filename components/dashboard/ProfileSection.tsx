@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { LogOut, FolderPlus, Layers, Save } from "lucide-react";
+import { useNotification } from "@/components/NotificationProvider";
 
 interface ProfileSectionProps {
   user: any;
@@ -25,6 +27,50 @@ export default function ProfileSection({
   seasons,
   handleToggleSeasonStatus,
 }: ProfileSectionProps) {
+  const { showNotification } = useNotification();
+  const [fullName, setFullName] = useState(user?.fullName || "");
+  const [field, setField] = useState(user?.field || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [updating, setUpdating] = useState(false);
+
+  const handleUpdateProfile = async () => {
+    if (!fullName.trim() || !field.trim()) {
+      showNotification(isRtl ? "نام و حوزه تخصصی نمی‌توانند خالی باشند." : "Name and Field cannot be empty.", "error");
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      const res = await fetch("/api/dashboard", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          fullName,
+          field,
+          bio,
+        }),
+      });
+
+      if (res.ok) {
+        const updatedData = await res.json();
+        const session = localStorage.getItem("user_session");
+        if (session) {
+          const parsed = JSON.parse(session);
+          localStorage.setItem("user_session", JSON.stringify({ ...parsed, fullName, field, bio }));
+        }
+        showNotification(isRtl ? "پروفایل با موفقیت بروزرسانی شد." : "Profile updated successfully.", "success");
+      } else {
+        const data = await res.json();
+        showNotification(data.error || "Error", "error");
+      }
+    } catch {
+      showNotification(isRtl ? "خطا در برقراری ارتباط با سرور." : "Network error.", "error");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-8 w-full">
       <div className="md:col-span-5 flex flex-col gap-6">
@@ -36,18 +82,36 @@ export default function ProfileSection({
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-slate-500">{isRtl ? "نام و نام خانوادگی" : "Full Name"}</span>
-              <input type="text" defaultValue={user.fullName} className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white" />
+              <input 
+                type="text" 
+                value={fullName} 
+                onChange={(e) => setFullName(e.target.value)}
+                className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500/50" 
+              />
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-slate-500">{isRtl ? "حوزه تخصصی / فیلد" : "Field"}</span>
-              <input type="text" defaultValue={user.field} className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white" />
+              <input 
+                type="text" 
+                value={field} 
+                onChange={(e) => setField(e.target.value)}
+                className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-cyan-500/50" 
+              />
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-slate-500">{isRtl ? "بیوگرافی" : "Bio"}</span>
-              <textarea defaultValue={user.bio} className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white h-24 resize-none" />
+              <textarea 
+                value={bio} 
+                onChange={(e) => setBio(e.target.value)}
+                className="bg-slate-950/60 border border-white/10 rounded-xl p-3 text-xs text-white h-24 resize-none outline-none focus:border-cyan-500/50" 
+              />
             </div>
-            <button className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 text-slate-950 font-black text-xs transition">
-              {isRtl ? "بروزرسانی اطلاعات" : "Update Profile"}
+            <button 
+              onClick={handleUpdateProfile}
+              disabled={updating}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 text-slate-950 font-black text-xs transition active:scale-[0.98] disabled:opacity-50"
+            >
+              {updating ? (isRtl ? "در حال بروزرسانی..." : "Updating...") : (isRtl ? "بروزرسانی اطلاعات" : "Update Profile")}
             </button>
             <button onClick={handleLogout} className="mt-2 flex items-center justify-center gap-2 text-xs text-rose-400 hover:underline">
               <LogOut className="w-4 h-4" />

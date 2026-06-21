@@ -3,10 +3,17 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Headphones, Activity, ShieldAlert } from "lucide-react";
+import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Headphones, Activity, ShieldAlert, Calendar, Folder } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Loader from "@/components/Loader";
+
+interface Season {
+  id: number;
+  seasonNum: string;
+  titleFa: string;
+  titleEn: string;
+}
 
 interface Episode {
   id: string;
@@ -18,6 +25,7 @@ interface Episode {
   coverUrl?: string;
   duration: string;
   episodeNum: string;
+  season?: Season | null;
 }
 
 export default function Home() {
@@ -331,8 +339,8 @@ export default function Home() {
               >
                 <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#22d3ee]/10 to-[#6366f1]/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
 
-                <div className="flex justify-between items-center z-10">
-                  <span className="font-mono text-xs bg-[#6366f1]/10 text-[#22d3ee] px-3 py-1.5 rounded-lg font-black border border-[#6366f1]/10">
+                <div className="flex justify-between items-center z-10 flex-wrap gap-2">
+                  <span className="font-mono text-[10px] md:text-xs bg-[#6366f1]/10 text-[#22d3ee] px-2.5 py-1.5 rounded-lg font-black border border-[#6366f1]/10">
                     EP {ep.episodeNum}
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -348,21 +356,42 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 items-center z-10">
-                  {ep.coverUrl ? (
-                    <img src={ep.coverUrl} alt={ep.titleEn} className="w-16 h-16 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 flex-shrink-0 group-hover:bg-[#6366f1]/20 transition-colors duration-500">
-                      <Headphones className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                <div className="flex flex-col gap-4 z-10">
+                  <div className="flex items-center gap-3 w-full bg-white/[0.02] border border-white/5 rounded-xl p-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <Folder className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[10px] md:text-xs font-bold text-slate-300">
+                        {ep.season 
+                          ? (isRtl ? `فصل ${ep.season.seasonNum}` : `Season ${ep.season.seasonNum}`)
+                          : (isRtl ? "تک اپیزود" : "Special Ep")
+                        }
+                      </span>
                     </div>
-                  )}
-                  <div className={isRtl ? "text-right" : "text-left"}>
-                    <h4 className="text-base md:text-lg font-black text-white mb-1.5 line-clamp-1 group-hover:text-[#22d3ee] transition-colors duration-300">
-                      {isRtl ? ep.titleFa : ep.titleEn}
-                    </h4>
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                      {isRtl ? ep.descFa : ep.descEn}
-                    </p>
+                    <span className="text-slate-600">|</span>
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#22d3ee]" />
+                      <span className="text-[10px] md:text-xs font-bold text-[#22d3ee]">
+                        {isRtl ? "پادکست PRM" : "PRM Podcast"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 items-center">
+                    {ep.coverUrl ? (
+                      <img src={ep.coverUrl} alt={ep.titleEn} className="w-16 h-16 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 flex-shrink-0 group-hover:bg-[#6366f1]/20 transition-colors duration-500">
+                        <Headphones className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                      </div>
+                    )}
+                    <div className={isRtl ? "text-right" : "text-left"}>
+                      <h4 className="text-base md:text-lg font-black text-white mb-1.5 line-clamp-1 group-hover:text-[#22d3ee] transition-colors duration-300">
+                        {isRtl ? ep.titleFa : ep.titleEn}
+                      </h4>
+                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                        {isRtl ? ep.descFa : ep.descEn}
+                      </p>
+                    </div>
                   </div>
                 </div>
 

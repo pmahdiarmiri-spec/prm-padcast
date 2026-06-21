@@ -20,7 +20,7 @@ model User {
 
 model Season {
   id          Int       @id @default(autoincrement())
-  seasonNum   String    @unique
+  seasonNum   String
   titleFa     String
   titleEn     String
   isCompleted Boolean   @default(false)
@@ -28,6 +28,8 @@ model Season {
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   episodes    Episode[]
+
+  @@unique([userId, seasonNum])
 }
 
 model Episode {
@@ -39,7 +41,7 @@ model Episode {
   audioUrl    String
   coverUrl    String
   duration    String
-  episodeNum  String   @unique
+  episodeNum  String
   status      String   @default("published")
   createdAt   DateTime @default(now())
   userId      Int?
@@ -47,6 +49,8 @@ model Episode {
   seasonId    Int?
   season      Season?  @relation(fields: [seasonId], references: [id])
   reports     Report[]
+
+  @@unique([seasonId, episodeNum])
 }
 
 model Report {

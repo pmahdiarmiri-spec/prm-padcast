@@ -5,15 +5,21 @@ export async function POST(request: Request) {
   try {
     const { episodeNum, reason, details } = await request.json();
     if (!episodeNum || !reason) {
-      return NextResponse.json({ error: "Episode number and reason are required" }, { status: 400 });
+      return NextResponse.json({ 
+        errorFa: "شماره اپیزود و علت گزارش اجباری هستند.", 
+        errorEn: "Episode number and reason are required" 
+      }, { status: 400 });
     }
 
-    const episode = await prisma.episode.findUnique({
+    const episode = await prisma.episode.findFirst({
       where: { episodeNum: String(episodeNum) },
     });
 
     if (!episode) {
-      return NextResponse.json({ error: "Episode not found" }, { status: 404 });
+      return NextResponse.json({ 
+        errorFa: "اپیزود مورد نظر پیدا نشد.", 
+        errorEn: "Episode not found" 
+      }, { status: 404 });
     }
 
     const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
@@ -28,7 +34,10 @@ export async function POST(request: Request) {
     });
 
     if (existingReport) {
-      return NextResponse.json({ error: "You have already reported this episode" }, { status: 409 });
+      return NextResponse.json({ 
+        errorFa: "شما قبلاً این اپیزود را گزارش کرده‌اید.", 
+        errorEn: "You have already reported this episode" 
+      }, { status: 409 });
     }
 
     const fullReason = details ? `${reason}: ${details}` : reason;
@@ -54,6 +63,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, reportsCount: reportCount });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ 
+      errorFa: "خطای داخلی سرور رخ داده است.", 
+      errorEn: error.message || "Internal Server Error" 
+    }, { status: 500 });
   }
 }

@@ -42,6 +42,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Required fields are missing" }, { status: 400 });
     }
 
+    const existingSeason = await prisma.season.findFirst({
+      where: {
+        userId: Number(userId),
+        seasonNum: String(seasonNum),
+      },
+    });
+
+    if (existingSeason) {
+      return NextResponse.json({ error: "Season number already exists for this user" }, { status: 400 });
+    }
+
     const newSeason = await prisma.season.create({
       data: {
         seasonNum: String(seasonNum),

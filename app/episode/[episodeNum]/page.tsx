@@ -4,13 +4,15 @@ import prisma from "@/lib/prisma";
 import EpisodeClientPage from "./EpisodeClientPage";
 
 interface Props {
-  params: Promise<{ episodeNum: string }>;
+  params: Promise<{ episodeNum: string } | { episodesNum: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  const episode = await prisma.episode.findUnique({
-    where: { episodeNum: resolvedParams.episodeNum },
+  const targetNum = "episodeNum" in resolvedParams ? resolvedParams.episodeNum : resolvedParams.episodesNum;
+  
+  const episode = await prisma.episode.findFirst({
+    where: { episodeNum: targetNum },
   });
 
   if (!episode) {
@@ -40,10 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function EpisodePage({ params }: Props) {
   const resolvedParams = await params;
-  const episode = await prisma.episode.findUnique({
-    where: { episodeNum: resolvedParams.episodeNum },
+  const targetNum = "episodeNum" in resolvedParams ? resolvedParams.episodeNum : resolvedParams.episodesNum;
+
+  const episode = await prisma.episode.findFirst({
+    where: { episodeNum: targetNum },
     include: {
       season: true,
+      user: true,
     }
   });
 
@@ -61,6 +66,7 @@ export default async function EpisodePage({ params }: Props) {
     audioUrl: episode.audioUrl,
     coverUrl: episode.coverUrl || "",
     duration: episode.duration,
+    creatorName: episode.user?.fullName || null,
     season: episode.season ? {
       seasonNum: episode.season.seasonNum,
       titleFa: episode.season.titleFa,

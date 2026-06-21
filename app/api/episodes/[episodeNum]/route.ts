@@ -3,11 +3,15 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { episodeNum: string } }
+  { params }: { params: { episodesNum?: string; episodeNum?: string } }
 ) {
   try {
-    const { episodeNum } = params;
-    const episode = await prisma.episode.findUnique({
+    const episodeNum = params.episodesNum || params.episodeNum;
+    if (!episodeNum) {
+      return NextResponse.json({ error: "Episode number is missing" }, { status: 400 });
+    }
+
+    const episode = await prisma.episode.findFirst({
       where: { episodeNum: String(episodeNum) },
       include: {
         season: true,

@@ -383,8 +383,10 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
                     }}
                     className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#6366f1]"
                   />
+                  <span className="font-mono text-[10px] text-slate-400 min-w-[28px] text-center">
+                    {Math.round((isMuted ? 0 : volume) * 100)}%
+                  </span>
                 </div>
-                <span className="font-mono text-[10px] md:text-xs text-slate-500">{episode.duration}</span>
               </div>
             </div>
             
@@ -417,6 +419,9 @@ export default function EpisodeClientPage({ episode }: { episode: Episode }) {
                 }}
                 className="w-full mx-3 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#6366f1]"
               />
+              <span className="font-mono text-[10px] text-slate-400 min-w-[28px] text-center">
+                {Math.round((isMuted ? 0 : volume) * 100)}%
+              </span>
             </div>
           </div>
         </motion.div>

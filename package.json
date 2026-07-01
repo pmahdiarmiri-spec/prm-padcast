@@ -15,7 +15,8 @@
     "next": "15.0.0",
     "prisma": "6.4.0",
     "react": "19.0.0-rc-65a56d0e-20241020",
-    "react-dom": "19.0.0-rc-65a56d0e-20241020"
+    "react-dom": "19.0.0-rc-65a56d0e-20241020",
+    "undici": "^8.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",

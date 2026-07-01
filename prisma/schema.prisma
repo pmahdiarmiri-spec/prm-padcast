@@ -43,6 +43,8 @@ model Episode {
   duration    String
   episodeNum  String
   status      String   @default("published")
+  transcript  String?
+  aiAnalysis  String?
   createdAt   DateTime @default(now())
   userId      Int?
   user        User?    @relation(fields: [userId], references: [id])
@@ -62,4 +64,15 @@ model Report {
   episode   Episode  @relation(fields: [episodeId], references: [id])
 
   @@unique([ipAddress, episodeId])
+}
+
+model AiHistory {
+  id            Int      @id @default(autoincrement())
+  fileName      String
+  audioUrl      String?
+  transcription String
+  analysis      String?
+  summaryFa     String?
+  summaryEn     String?
+  createdAt     DateTime @default(now())
 }

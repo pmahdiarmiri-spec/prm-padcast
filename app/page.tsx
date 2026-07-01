@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Headphones, Activity, ShieldAlert, Calendar, Folder } from "lucide-react";
+import { Play, Pause, ArrowUpRight, Cpu, Code2, Globe, Database, Users, Sparkles, Terminal, Headphones, Activity, ShieldAlert, Calendar, Folder, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Loader from "@/components/Loader";
@@ -31,6 +31,7 @@ interface Episode {
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const [lang, setLang] = useState<"fa" | "en" | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -170,6 +171,11 @@ export default function Home() {
     }
   };
 
+  const handleEpisodeClick = (epNum: string, epId: string) => {
+    setNavigatingId(epId);
+    router.push(`/episode/${epNum}`);
+  };
+
   if (!lang) return null;
 
   const isRtl = lang === "fa";
@@ -193,6 +199,24 @@ export default function Home() {
     <>
       <AnimatePresence>
         {loading && <Loader onComplete={() => setLoading(false)} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {navigatingId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-[#02040a]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-4"
+          >
+            <div className="relative w-16 h-16 flex items-center justify-center">
+              <Loader2 className="w-12 h-12 text-[#22d3ee] animate-spin stroke-[1.5]" />
+            </div>
+            <p className="text-xs font-bold font-mono tracking-widest text-[#22d3ee] animate-pulse">
+              {isRtl ? "در حال بارگذاری اپیزود..." : "LOADING EPISODE..."}
+            </p>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <main dir={isRtl ? "rtl" : "ltr"} className={`relative min-h-screen flex flex-col justify-between p-4 md:p-8 pt-24 md:pt-28 z-10 overflow-x-hidden ${lang === "en" ? "font-inter" : "font-vazirmatn"}`}>
@@ -332,7 +356,7 @@ export default function Home() {
             {episodes.map((ep) => (
               <div 
                 key={ep.id} 
-                onClick={() => router.push(`/episode/${ep.episodeNum}`)}
+                onClick={() => handleEpisodeClick(ep.episodeNum, ep.id)}
                 className={`group relative overflow-hidden bg-slate-950/40 backdrop-blur-md border rounded-2xl p-6 flex flex-col justify-between gap-6 transition-all duration-500 cursor-pointer ${
                   currentEpisode?.id === ep.id ? "border-[#6366f1] bg-[#6366f1]/5 shadow-lg shadow-[#6366f1]/10" : "border-white/5 hover:border-[#6366f1]/40 hover:bg-[#6366f1]/5"
                 }`}

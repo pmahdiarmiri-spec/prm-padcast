@@ -1,10 +1,26 @@
 import type { Metadata } from "next";
-import { Vazirmatn, Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const vazirmatn = Vazirmatn({
-  subsets: ["arabic"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+const vazirmatn = localFont({
+  src: [
+    {
+      path: "../public/fonts/Vazirmatn-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Vazirmatn-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Vazirmatn-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-vazirmatn",
   display: "swap",
 });
@@ -13,7 +29,7 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
-} );
+});
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],

@@ -2,25 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { ArrowLeft, LogIn, User, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface HeaderProps {
   lang: "fa" | "en";
-  setLang: (lang: "fa" | "en") => void;
   showBack?: boolean;
 }
 
-export default function Header({ lang, setLang, showBack = false }: HeaderProps) {
+export default function Header({ lang, showBack = false }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const isRtl = lang === "fa";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("prm_lang") as "fa" | "en" | null;
-    if (savedLang && savedLang !== lang) {
-      setLang(savedLang);
-    }
-  }, [lang, setLang]);
 
   useEffect(() => {
     const checkUser = () => {
@@ -41,21 +34,29 @@ export default function Header({ lang, setLang, showBack = false }: HeaderProps)
 
   const handleLangToggle = () => {
     const nextLang = lang === "fa" ? "en" : "fa";
-    setLang(nextLang);
+    document.cookie = `prm_lang=${nextLang}; path=/; max-age=31536000`;
     localStorage.setItem("prm_lang", nextLang);
+
+    const segments = pathname.split("/");
+    if (segments.length > 1 && (segments[1] === "fa" || segments[1] === "en")) {
+      segments[1] = nextLang;
+      router.push(segments.join("/"));
+    } else {
+      router.push(`/${nextLang}`);
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user_session");
     setIsLoggedIn(false);
-    router.push("/");
+    router.push(`/${lang}`);
   };
 
   return (
     <header className="glass-panel fixed top-4 left-4 right-4 z-50 w-[calc(100%-2rem)] max-w-7xl mx-auto rounded-2xl px-4 md:px-5 py-3 md:py-3.5 flex justify-between items-center transition-all duration-300">
       {showBack ? (
         <button 
-          onClick={() => router.push("/")}
+          onClick={() => router.push(`/${lang}`)}
           className="glass-card px-3 md:px-4 py-2 rounded-xl text-xs font-semibold text-white flex items-center gap-2 hover:border-[#6366f1]/20 hover:text-[#22d3ee] active:scale-95"
         >
           <ArrowLeft className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`} />
@@ -85,7 +86,7 @@ export default function Header({ lang, setLang, showBack = false }: HeaderProps)
           isLoggedIn ? (
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push(`/${lang}/dashboard`)}
                 className="glass-card w-9 h-9 md:w-10 md:h-10 rounded-xl text-white flex items-center justify-center hover:border-[#22d3ee]/20 hover:text-[#22d3ee] active:scale-95"
                 title={isRtl ? "پنل کاربری" : "Dashboard"}
               >
@@ -101,7 +102,7 @@ export default function Header({ lang, setLang, showBack = false }: HeaderProps)
             </div>
           ) : (
             <button 
-              onClick={() => router.push("/auth")}
+              onClick={() => router.push(`/${lang}/auth`)}
               className="glass-card px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-xs font-semibold text-white flex items-center gap-1.5 hover:border-[#6366f1]/20 hover:text-[#22d3ee] active:scale-95"
             >
               <span className="hidden sm:inline">{isRtl ? "پنل پادکست سازان" : "Creators Dashboard"}</span>

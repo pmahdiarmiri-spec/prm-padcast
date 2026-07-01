@@ -1,6 +1,6 @@
 "use client";
 
-import { Radio, FileAudio, Image as ImageIcon, Sparkles, FolderPlus, Layers } from "lucide-react";
+import { Radio, FileAudio, Image as ImageIcon, FolderPlus, Layers } from "lucide-react";
 import { useState } from "react";
 
 interface UploadSectionProps {

@@ -1,0 +1,20 @@
+{
+  "auth": {
+    "title": "Join Platform",
+    "description": "Enter email or phone to access dashboard.",
+    "identifier": "Email or Phone",
+    "proceed": "Proceed",
+    "verifyTitle": "Identity Verification",
+    "verifyDesc": "Enter passcode to verify your account.",
+    "confirm": "Confirm Code",
+    "registerTitle": "Create Podcast Profile",
+    "fullName": "Full Name",
+    "expertise": "Expertise",
+    "complete": "Complete Registration"
+  },
+  "home": {
+    "heroTitle": "Deep Dissection of",
+    "heroSubtitle": "Software Engineering & Production AI",
+    "listenLatest": "Listen Latest Episode"
+  }
+}

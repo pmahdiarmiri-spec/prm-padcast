@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { KeyRound, User, Briefcase, FileText, Smartphone, Radio, Sparkles, Cpu, ChevronLeft, ArrowLeftRight } from "lucide-react";
+import { KeyRound, User, Briefcase, FileText, Smartphone, Radio, Sparkles, ChevronLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -11,6 +11,7 @@ export default function AuthPage() {
   const router = useRouter();
   const [lang, setLang] = useState<"fa" | "en">("fa");
   const [step, setStep] = useState<"check" | "login" | "register">("check");
+  const [isVerified, setIsVerified] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [fullName, setFullName] = useState("");
   const [field, setField] = useState("");
@@ -66,7 +67,10 @@ export default function AuthPage() {
 
       if (res.ok) {
         localStorage.setItem("user_session", JSON.stringify(data));
-        router.push("/dashboard");
+        setIsVerified(true);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2200);
       } else {
         setError(data.error || "Login failed");
       }
@@ -92,7 +96,10 @@ export default function AuthPage() {
 
       if (res.ok) {
         localStorage.setItem("user_session", JSON.stringify(data));
-        router.push("/dashboard");
+        setIsVerified(true);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2200);
       } else {
         setError(data.error || "Registration failed");
       }
@@ -183,156 +190,229 @@ export default function AuthPage() {
           </motion.div>
         </div>
 
-        <div className="w-full lg:col-span-6 max-w-md mx-auto">
-          <AnimatePresence mode="wait">
-            {step === "check" && (
-              <motion.form 
-                key="check"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                onSubmit={handleCheck}
-                className="glass-panel w-full rounded-2xl p-6 md:p-8 flex flex-col gap-6 border border-white/10"
-              >
-                <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
-                  <h2 className="text-2xl font-black text-white">{isRtl ? "ورود یا عضویت" : "Join Platform"}</h2>
-                  <p className="text-xs text-slate-400">{isRtl ? "جهت دسترسی، ایمیل یا شماره موبایل خود را وارد کنید." : "Enter email or phone to access dashboard."}</p>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    type="text"
-                    placeholder={isRtl ? "ایمیل یا شماره موبایل" : "Email or Phone"}
-                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl py-4 px-12 text-white placeholder-slate-500 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-all outline-none text-sm text-center font-mono"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                  />
-                  <Smartphone className={`absolute top-4 w-5 h-5 text-slate-500 group-focus-within:text-[#6366f1] transition-colors ${isRtl ? "left-4" : "right-4"}`} />
-                </div>
-
-                {error && <span className="text-xs text-red-400 text-center">{error}</span>}
-
-                <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#6366f1] via-[#a78bfa] to-[#22d3ee] hover:opacity-90 active:scale-95 text-slate-950 font-black text-sm transition-all shadow-lg shadow-[#6366f1]/20">
-                  {loading ? "..." : (isRtl ? "بررسی و ادامه" : "Proceed")}
-                </button>
-              </motion.form>
-            )}
-
-            {step === "login" && (
-              <motion.form 
-                key="login"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                onSubmit={handleLogin}
-                className="glass-panel w-full rounded-2xl p-6 md:p-8 flex flex-col gap-6 border border-white/10"
-              >
-                <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
-                  <button type="button" onClick={() => setStep("check")} className="inline-flex items-center gap-1 text-[10px] text-[#6366f1] hover:underline mb-2">
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    <span>{isRtl ? "تغییر شماره/ایمیل" : "Change Identifer"}</span>
-                  </button>
-                  <h2 className="text-2xl font-black text-white">{isRtl ? "تایید هویت" : "Identity Verification"}</h2>
-                  <p className="text-xs text-slate-400">{isRtl ? "رمز عبور یا کد یکبار مصرف ارسال‌شده را وارد کنید." : "Enter passcode to verify your account."}</p>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    type="password"
-                    placeholder="•••••"
-                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl py-4 px-12 text-white placeholder-slate-500 focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa] transition-all outline-none text-sm text-center font-mono tracking-widest"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <KeyRound className={`absolute top-4 w-5 h-5 text-slate-500 group-focus-within:text-[#a78bfa] transition-colors ${isRtl ? "left-4" : "right-4"}`} />
-                </div>
-
-                {error && <span className="text-xs text-red-400 text-center">{error}</span>}
-
-                <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#a78bfa] to-[#6366f1] hover:opacity-90 active:scale-95 text-white font-black text-sm transition-all shadow-lg shadow-[#a78bfa]/20">
-                  {isRtl ? "تایید نهایی و ورود" : "Confirm Code"}
-                </button>
-              </motion.form>
-            )}
-
-            {step === "register" && (
-              <motion.form 
-                key="register"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                onSubmit={handleRegister}
-                className="glass-panel w-full rounded-2xl p-6 md:p-8 flex flex-col gap-5 border border-white/10"
-              >
-                <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
-                  <button type="button" onClick={() => setStep("check")} className="inline-flex items-center gap-1 text-[10px] text-[#22d3ee] hover:underline mb-2">
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    <span>{isRtl ? "بازگشت" : "Go Back"}</span>
-                  </button>
-                  <h2 className="text-xl font-black text-white">{isRtl ? "ساخت اکانت تخصصی" : "Create Podcast Profile"}</h2>
-                  <p className="text-xs text-slate-400">{isRtl ? "مشخصات مهارتی خود را ثبت کنید." : "Set up your podcaster credentials."}</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      placeholder={isRtl ? "نام و نام خانوادگی" : "Full Name"}
-                      className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                    />
-                    <User className={`absolute top-3.5 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
+        <div className="w-full lg:col-span-6 max-w-md mx-auto min-h-[420px] flex items-center justify-center">
+          <div className="glass-panel w-full rounded-2xl p-6 md:p-8 border border-white/10 relative overflow-hidden flex flex-col justify-center min-h-[420px]">
+            <AnimatePresence mode="wait">
+              {isVerified ? (
+                <motion.div
+                  key="success-animation"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="flex flex-col items-center justify-center text-center py-8"
+                >
+                  <div className="relative flex items-center justify-center w-24 h-24 mb-6">
+                    <motion.svg
+                      viewBox="0 0 100 100"
+                      className="absolute w-24 h-24 text-emerald-500"
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <motion.circle
+                        cx="50"
+                        cy="50"
+                        r="42"
+                        stroke="currentColor"
+                        strokeWidth="5"
+                        fill="transparent"
+                        variants={{
+                          hidden: { pathLength: 0, opacity: 0 },
+                          visible: {
+                            pathLength: 1,
+                            opacity: 1,
+                            transition: { duration: 0.8, ease: "easeInOut" }
+                          }
+                        }}
+                      />
+                      <motion.path
+                        d="M32 50 L44 62 L68 38"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="transparent"
+                        variants={{
+                          hidden: { pathLength: 0 },
+                          visible: {
+                            pathLength: 1,
+                            transition: { duration: 0.6, delay: 0.6, ease: "easeInOut" }
+                          }
+                        }}
+                      />
+                    </motion.svg>
+                    <div className="absolute w-28 h-28 rounded-full border border-dashed border-emerald-500/20 animate-spin" style={{ animationDuration: '8s' }} />
                   </div>
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 }}
+                    className="text-2xl font-black text-white mb-2"
+                  >
+                    {isRtl ? "تایید هویت موفقیت‌آمیز بود" : "Verified Successfully"}
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.4 }}
+                    className="text-xs text-slate-400"
+                  >
+                    {isRtl ? "در حال انتقال به پنل کاربری..." : "Redirecting you to the dashboard..."}
+                  </motion.p>
+                </motion.div>
+              ) : (
+                <div className="w-full">
+                  {step === "check" && (
+                    <motion.form 
+                      key="check"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                      onSubmit={handleCheck}
+                      className="flex flex-col gap-6"
+                    >
+                      <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
+                        <h2 className="text-2xl font-black text-white">{isRtl ? "ورود یا عضویت" : "Join Platform"}</h2>
+                        <p className="text-xs text-slate-400">{isRtl ? "جهت دسترسی، ایمیل یا شماره موبایل خود را وارد کنید." : "Enter email or phone to access dashboard."}</p>
+                      </div>
 
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      placeholder={isRtl ? "حوزه فعالیت (مثال: هوش مصنوعی)" : "Expertise"}
-                      className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
-                      value={field}
-                      onChange={(e) => setField(e.target.value)}
-                      required
-                    />
-                    <Briefcase className={`absolute top-3.5 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
-                  </div>
+                      <div className="relative group">
+                        <input
+                          type="text"
+                          placeholder={isRtl ? "ایمیل یا شماره موبایل" : "Email or Phone"}
+                          className="w-full bg-slate-950/50 border border-white/10 rounded-xl py-4 px-12 text-white placeholder-slate-500 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-all outline-none text-sm text-center font-mono"
+                          value={identifier}
+                          onChange={(e) => setIdentifier(e.target.value)}
+                          required
+                        />
+                        <Smartphone className={`absolute top-4 w-5 h-5 text-slate-500 group-focus-within:text-[#6366f1] transition-colors ${isRtl ? "left-4" : "right-4"}`} />
+                      </div>
+
+                      {error && <span className="text-xs text-red-400 text-center">{error}</span>}
+
+                      <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#6366f1] via-[#a78bfa] to-[#22d3ee] hover:opacity-90 active:scale-95 text-slate-950 font-black text-sm transition-all shadow-lg shadow-[#6366f1]/20">
+                        {loading ? "..." : (isRtl ? "بررسی و ادامه" : "Proceed")}
+                      </button>
+                    </motion.form>
+                  )}
+
+                  {step === "login" && (
+                    <motion.form 
+                      key="login"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                      onSubmit={handleLogin}
+                      className="flex flex-col gap-6"
+                    >
+                      <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
+                        <button type="button" onClick={() => setStep("check")} className="inline-flex items-center gap-1 text-[10px] text-[#6366f1] hover:underline mb-2">
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span>{isRtl ? "تغییر شماره/ایمیل" : "Change Identifer"}</span>
+                        </button>
+                        <h2 className="text-2xl font-black text-white">{isRtl ? "تایید هویت" : "Identity Verification"}</h2>
+                        <p className="text-xs text-slate-400">{isRtl ? "رمز عبور یا کد یکبار مصرف ارسال‌شده را وارد کنید." : "Enter passcode to verify your account."}</p>
+                      </div>
+
+                      <div className="relative group">
+                        <input
+                          type="password"
+                          placeholder="•••••"
+                          className="w-full bg-slate-950/50 border border-white/10 rounded-xl py-4 px-12 text-white placeholder-slate-500 focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa] transition-all outline-none text-sm text-center font-mono tracking-widest"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <KeyRound className={`absolute top-4 w-5 h-5 text-slate-500 group-focus-within:text-[#a78bfa] transition-colors ${isRtl ? "left-4" : "right-4"}`} />
+                      </div>
+
+                      {error && <span className="text-xs text-red-400 text-center">{error}</span>}
+
+                      <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#a78bfa] to-[#6366f1] hover:opacity-90 active:scale-95 text-white font-black text-sm transition-all shadow-lg shadow-[#a78bfa]/20">
+                        {loading ? "..." : (isRtl ? "تایید نهایی و ورود" : "Confirm Code")}
+                      </button>
+                    </motion.form>
+                  )}
+
+                  {step === "register" && (
+                    <motion.form 
+                      key="register"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                      onSubmit={handleRegister}
+                      className="flex flex-col gap-5"
+                    >
+                      <div className={`space-y-2 text-center ${isRtl ? "lg:text-right" : "lg:text-left"}`}>
+                        <button type="button" onClick={() => setStep("check")} className="inline-flex items-center gap-1 text-[10px] text-[#22d3ee] hover:underline mb-2">
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span>{isRtl ? "بازگشت" : "Go Back"}</span>
+                        </button>
+                        <h2 className="text-xl font-black text-white">{isRtl ? "ساخت اکانت تخصصی" : "Create Podcast Profile"}</h2>
+                        <p className="text-xs text-slate-400">{isRtl ? "مشخصات مهارتی خود را ثبت کنید." : "Set up your podcaster credentials."}</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="relative group">
+                          <input
+                            type="text"
+                            placeholder={isRtl ? "نام و نام خانوادگی" : "Full Name"}
+                            className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            required
+                          />
+                          <User className={`absolute top-3.5 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
+                        </div>
+
+                        <div className="relative group">
+                          <input
+                            type="text"
+                            placeholder={isRtl ? "حوزه فعالیت (مثال: هوش مصنوعی)" : "Expertise"}
+                            className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
+                            value={field}
+                            onChange={(e) => setField(e.target.value)}
+                            required
+                          />
+                          <Briefcase className={`absolute top-3.5 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
+                        </div>
+                      </div>
+
+                      <div className="relative group">
+                        <textarea
+                          placeholder={isRtl ? "خلاصه رزومه حرفه‌ای، علاقه‌مندی‌ها یا سوابق کاری کلیدی..." : "Summarize your resume, fields of interest or experiences..."}
+                          className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3.5 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs h-24 resize-none leading-relaxed transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
+                          value={bio}
+                          onChange={(e) => setBio(e.target.value)}
+                        />
+                        <FileText className={`absolute top-4 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
+                      </div>
+
+                      <div className="relative group">
+                        <input
+                          type="text"
+                          placeholder={isRtl ? "کد تایید ارسال شده (12345)" : "Verification Code (12345)"}
+                          className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 px-10 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs text-center font-mono tracking-widest"
+                          value={smsCode}
+                          onChange={(e) => setSmsCode(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      {error && <span className="text-xs text-red-400 text-center">{error}</span>}
+
+                      <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#22d3ee] via-[#6366f1] to-[#a78bfa] text-slate-950 font-black text-sm transition-all active:scale-95 shadow-lg shadow-[#22d3ee]/10">
+                        {loading ? "..." : (isRtl ? "تکمیل ثبت نام و ورود" : "Complete Registration")}
+                      </button>
+                    </motion.form>
+                  )}
                 </div>
-
-                <div className="relative group">
-                  <textarea
-                    placeholder={isRtl ? "خلاصه رزومه حرفه‌ای، علاقه‌مندی‌ها یا سوابق کاری کلیدی..." : "Summarize your resume, fields of interest or experiences..."}
-                    className={`w-full bg-slate-950/50 border border-white/10 rounded-xl p-3.5 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs h-24 resize-none leading-relaxed transition-all ${isRtl ? "pl-3 pr-10" : "pr-3 pl-10"}`}
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                  />
-                  <FileText className={`absolute top-4 w-4 h-4 text-slate-500 group-focus-within:text-[#22d3ee] transition-colors ${isRtl ? "right-3" : "left-3"}`} />
-                </div>
-
-                <div className="relative group">
-                  <input
-                    type="text"
-                    placeholder={isRtl ? "کد تایید ارسال شده (12345)" : "Verification Code (12345)"}
-                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 px-10 text-white placeholder-slate-500 focus:border-[#22d3ee] outline-none text-xs text-center font-mono tracking-widest"
-                    value={smsCode}
-                    onChange={(e) => setSmsCode(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {error && <span className="text-xs text-red-400 text-center">{error}</span>}
-
-                <button type="submit" disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-[#22d3ee] via-[#6366f1] to-[#a78bfa] text-slate-950 font-black text-sm transition-all active:scale-95 shadow-lg shadow-[#22d3ee]/10">
-                  {isRtl ? "تکمیل ثبت نام و ورود" : "Complete Registration"}
-                </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 

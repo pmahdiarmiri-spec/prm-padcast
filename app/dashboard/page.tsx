@@ -270,12 +270,6 @@ function DashboardContent() {
               user={user}
               isRtl={isRtl}
               handleLogout={handleLogout}
-              handleCreateSeason={handleCreateSeason}
-              seasonForm={seasonForm}
-              setSeasonForm={setSeasonForm}
-              creatingSeason={creatingSeason}
-              seasons={seasons}
-              handleToggleSeasonStatus={handleToggleSeasonStatus}
             />
           )}
 
@@ -296,6 +290,11 @@ function DashboardContent() {
               handleAudioUpload={handleAudioUpload}
               handleImageUpload={handleImageUpload}
               userEpisodes={userEpisodes}
+              handleCreateSeason={handleCreateSeason}
+              seasonForm={seasonForm}
+              setSeasonForm={setSeasonForm}
+              creatingSeason={creatingSeason}
+              handleToggleSeasonStatus={handleToggleSeasonStatus}
             />
           )}
 

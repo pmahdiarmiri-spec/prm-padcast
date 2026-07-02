@@ -74,5 +74,7 @@ model AiHistory {
   analysis      String?
   summaryFa     String?
   summaryEn     String?
+  linkedinPost  String?
+  githubSummary String?
   createdAt     DateTime @default(now())
 }

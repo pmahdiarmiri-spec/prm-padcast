@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as Blob | null;
     const analyze = formData.get("analyze") === "true";
+    const includeSocial = formData.get("includeSocial") === "true";
     const language = (formData.get("language") as string) || "fa";
 
     if (!file) {
@@ -48,13 +49,11 @@ export async function POST(request: Request) {
         body: externalFormData,
       });
     } catch (fetchErr: any) {
-      console.error("Groq Network Error:", fetchErr.message);
       return NextResponse.json({ error: "Network Error contacting Groq", details: fetchErr.message }, { status: 502 });
     }
 
     if (!whisperResponse.ok) {
       const errorText = await whisperResponse.text();
-      console.error("Groq API Error Details:", errorText);
       return NextResponse.json({ error: "Whisper API failed", details: errorText }, { status: whisperResponse.status });
     }
 
@@ -65,6 +64,8 @@ export async function POST(request: Request) {
     let analysisText = "";
     let summaryFa = "";
     let summaryEn = "";
+    let linkedinPost = "";
+    let githubSummary = "";
 
     if (rawTranscription) {
       try {
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
             messages: [
               {
                 role: "system",
-                content: "You are an expert Persian editor. Your job is to correct transcription errors (e.g., misheard words, spelling issues, spacing) from speech-to-text models. Rewrite the text into highly fluent, readable, and grammatically correct Persian. Keep the original format, tone, and spoken words, but correct typos, slurs, and obvious errors (e.g., convert 'زبط' to 'ضبط', 'توستمسترز' to 'توست‌مسترز', 'آیی میری' to 'آقای میری', '960ز آرتمان' to '۹۶۰ هزار تومان', 'پرنامه‌نسی' to 'برنامه‌نویسی'). Only output the corrected text and nothing else."
+                content: "You are an expert Persian editor. Your job is to correct transcription errors. Rewrite the text into highly fluent, readable, and grammatically correct Persian. Only output the corrected text and nothing else."
               },
               {
                 role: "user",
@@ -97,12 +98,16 @@ export async function POST(request: Request) {
           }
         }
       } catch (err) {
-        console.error("Correction failed, using raw:", err);
+        console.error(err);
       }
     }
 
     if (finalTranscription) {
       try {
+        const systemPrompt = includeSocial
+          ? "You are an expert copywriter. Provide four key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). Section 3: An engaging LinkedIn post layout with hashtags based on the content (LinkedIn Post). Section 4: A technical repository readme summary suitable for GitHub in markdown format (GitHub Summary). You MUST use the exact tags <persian></persian>, <english></english>, <linkedin></linkedin>, and <github></github> in your response to enclose each corresponding section. Do not combine, skip or alter these tags."
+          : "You are an expert copywriter. Provide two key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). You MUST use the exact tags <persian></persian> and <english></english> in your response to enclose each corresponding section. Do not combine, skip or alter these tags.";
+
         const summaryResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -114,11 +119,11 @@ export async function POST(request: Request) {
             messages: [
               {
                 role: "system",
-                content: "You are an expert copywriter. Provide two key output sections for the user to copy/paste into their podcast description fields. Section 1: A brief, engaging, and professional podcast description in fluent Persian (خلاصه فارسی). Section 2: An accurate, professional translation and summary in English (English Summary). Keep both summaries under 150 words each. Use this exact format, keeping the XML-like tags so they can be parsed:\n<persian>\n[Persian Description Here]\n</persian>\n<english>\n[English Description Here]\n</english>"
+                content: systemPrompt
               },
               {
                 role: "user",
-                content: finalTranscription
+                content: `Please summarize and translate the following transcription into both Persian and English using the required XML tags:\n\n${finalTranscription}`
               }
             ],
             temperature: 0.3,
@@ -129,18 +134,28 @@ export async function POST(request: Request) {
           const summaryData = await summaryResponse.json();
           const summaryContent = summaryData.choices?.[0]?.message?.content || "";
           
-          const faMatch = summaryContent.match(/<persian>([\s\S]*?)<\/persian>/);
-          const enMatch = summaryContent.match(/<english>([\s\S]*?)<\/english>/);
+          const faMatch = summaryContent.match(/<persian>([\s\S]*?)<\/persian>/i);
+          const enMatch = summaryContent.match(/<english>([\s\S]*?)<\/english>/i);
           
           if (faMatch) summaryFa = faMatch[1].trim();
           if (enMatch) summaryEn = enMatch[1].trim();
           
-          if (!summaryFa && !summaryEn) {
+          if (includeSocial) {
+            const linkedinMatch = summaryContent.match(/<linkedin>([\s\S]*?)<\/linkedin>/i);
+            const githubMatch = summaryContent.match(/<github>([\s\S]*?)<\/github>/i);
+            if (linkedinMatch) linkedinPost = linkedinMatch[1].trim();
+            if (githubMatch) githubSummary = githubMatch[1].trim();
+          }
+          
+          if (!summaryFa) {
             summaryFa = summaryContent;
+          }
+          if (!summaryEn) {
+            summaryEn = "Summary translation is being generated or was formatted incorrectly by the model.";
           }
         }
       } catch (err) {
-        console.error("Summarization failed:", err);
+        console.error(err);
       }
     }
 
@@ -157,11 +172,11 @@ export async function POST(request: Request) {
             messages: [
               {
                 role: "system",
-                content: "You are an advanced podcast analyzer and speech mentor. Analyze the Persian transcript provided. Your analysis must contain: 1) Executive Summary (خلاصه مدیریتی), 2) Key Points (نکات کلیدی), 3) Pros & Strengths (نقاط قوت), 4) Cons & Speech Errors (نقاط ضعف و اشکالات گفتاری), and 5) Actionable Solutions & Recommendations (راهکارها و توصیه‌های عملیاتی). Format your output with clear headings, bullet points, and a professional, constructive Persian tone."
+                content: "You are an advanced podcast analyzer and speech mentor. Analyze the Persian transcript provided. You MUST talk directly to the user (the speaker) using 'you' (شما/لحن دوم شخص) instead of talking about them as a third person. Do not use words like 'گوینده' or 'او'. Instead, use direct phrases like 'شما در این پادکست...', 'نقاط قوت شما...', 'لحن شما...'. Never use foreign words like 'facile', 'difficile', or 'tham gia'. Translate everything into pure, fluent, professional Persian. Your analysis must contain: 1) Executive Summary (خلاصه مدیریتی), 2) Key Points (نکات کلیدی), 3) Pros & Strengths (نقاط قوت), 4) Cons & Speech Errors (نقاط ضعف و اشکالات گفتاری), and 5) Actionable Solutions & Recommendations (راهکارها و توصیه‌های عملیاتی). Format your output with clear headings, bullet points, and a professional, constructive Persian tone."
               },
               {
                 role: "user",
-                content: `لطفاً متن پادکست زیر را به دقت تحلیل کن و با جزئیات کامل، نقاط قوت، نقاط ضعف، نکات کلیدی و راهکارهای اصلاحی را به زبان فارسی روان ارائه بده:\n\n${finalTranscription}`
+                content: `لطفاً متن پادکست من را به دقت تحلیل کن و با جزئیات کامل، نقاط قوت، نقاط ضعف، نکات کلیدی و راهکارهای اصلاحی را با لحن مستقیم خطاب به من (شما) به زبان فارسی روان ارائه بده:\n\n${finalTranscription}`
               }
             ],
             temperature: 0.5,
@@ -172,12 +187,9 @@ export async function POST(request: Request) {
         if (groqChatResponse.ok) {
           const chatData = await groqChatResponse.json();
           analysisText = chatData.choices?.[0]?.message?.content || "";
-        } else {
-          const chatErrText = await groqChatResponse.text();
-          console.error("Groq Chat Analysis Error Details:", chatErrText);
         }
-      } catch (chatErr: any) {
-        console.error("Groq Chat Connection Error:", chatErr.message);
+      } catch (chatErr) {
+        console.error(chatErr);
       }
     }
 
@@ -188,6 +200,8 @@ export async function POST(request: Request) {
         analysis: analysisText || null,
         summaryFa: summaryFa || null,
         summaryEn: summaryEn || null,
+        linkedinPost: linkedinPost || null,
+        githubSummary: githubSummary || null,
       }
     });
 
@@ -197,11 +211,12 @@ export async function POST(request: Request) {
       analysis: analysisText,
       summaryFa,
       summaryEn,
+      linkedinPost,
+      githubSummary,
       recordId: savedRecord.id
     });
 
   } catch (error: any) {
-    console.error("Route Handler Exception:", error.message);
     return NextResponse.json({ error: "AI Server Error", details: error.message }, { status: 500 });
   }
 }

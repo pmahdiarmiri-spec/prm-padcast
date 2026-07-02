@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, Sparkle, AlertCircle, Languages, FileText, History, Headphones, Calendar } from "lucide-react";
+import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, AlertCircle, Languages, FileText, History, Headphones, Calendar } from "lucide-react";
 
 interface HistoryItem {
   id: number;
@@ -10,6 +10,8 @@ interface HistoryItem {
   analysis?: string;
   summaryFa?: string;
   summaryEn?: string;
+  linkedinPost?: string;
+  githubSummary?: string;
   createdAt: string;
 }
 
@@ -17,10 +19,12 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [analyzeText, setAnalyzeText] = useState(false);
+  const [includeSocial, setIncludeSocial] = useState(false);
   const [audioLang, setAudioLang] = useState<"fa" | "en">("fa");
-  const [result, setResult] = useState<{ transcription: string; analysis?: string; summaryFa?: string; summaryEn?: string } | null>(null);
+  const [result, setResult] = useState<{ transcription: string; analysis?: string; summaryFa?: string; summaryEn?: string; linkedinPost?: string; githubSummary?: string } | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<"process" | "history">("process");
+  const [socialTab, setSocialTab] = useState<"linkedin" | "github">("linkedin");
 
   useEffect(() => {
     fetchHistory();
@@ -52,6 +56,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("analyze", analyzeText ? "true" : "false");
+    formData.append("includeSocial", includeSocial ? "true" : "false");
     formData.append("language", audioLang);
 
     try {
@@ -67,6 +72,8 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
           analysis: data.analysis,
           summaryFa: data.summaryFa,
           summaryEn: data.summaryEn,
+          linkedinPost: data.linkedinPost,
+          githubSummary: data.githubSummary,
         });
         fetchHistory();
       } else {
@@ -90,6 +97,8 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
       analysis: item.analysis,
       summaryFa: item.summaryFa,
       summaryEn: item.summaryEn,
+      linkedinPost: item.linkedinPost,
+      githubSummary: item.githubSummary,
     });
     setActiveTab("process");
   };
@@ -197,15 +206,27 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
                 </div>
               </div>
 
-              <label className="text-xs text-slate-300 flex items-center gap-2 cursor-pointer py-1">
-                <input 
-                  type="checkbox" 
-                  checked={analyzeText} 
-                  onChange={(e) => setAnalyzeText(e.target.checked)} 
-                  className="rounded border-slate-800 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
-                />
-                {isRtl ? "تحلیل متن با هوش مصنوعی Llama 3.3" : "Analyze with Llama 3.3"}
-              </label>
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={analyzeText} 
+                    onChange={(e) => setAnalyzeText(e.target.checked)} 
+                    className="rounded border-slate-800 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
+                  />
+                  {isRtl ? "تحلیل متن با هوش مصنوعی Llama 3.3" : "Analyze with Llama 3.3"}
+                </label>
+
+                <label className="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={includeSocial} 
+                    onChange={(e) => setIncludeSocial(e.target.checked)} 
+                    className="rounded border-slate-800 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
+                  />
+                  {isRtl ? "تولید کیت شبکه‌های اجتماعی (لینکدین و گیت‌هاب)" : "Generate Social Media Kit (LinkedIn & GitHub)"}
+                </label>
+              </div>
             </div>
 
             <button 
@@ -267,11 +288,68 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
                   </div>
                 </div>
 
+                {(result.linkedinPost || result.githubSummary) && (
+                  <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
+                    <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+                      <span className="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-cyan-400" />
+                        {isRtl ? "کیت رسانه‌های اجتماعی" : "Social Media Kit"}
+                      </span>
+                      <div className="flex gap-1 bg-slate-900 p-0.5 rounded-lg border border-white/5">
+                        <button 
+                          onClick={() => setSocialTab("linkedin")}
+                          className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md transition ${socialTab === "linkedin" ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"}`}
+                        >
+                          <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                          </svg>
+                          LinkedIn
+                        </button>
+                        <button 
+                          onClick={() => setSocialTab("github")}
+                          className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md transition ${socialTab === "github" ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"}`}
+                        >
+                          <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                          </svg>
+                          GitHub
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {socialTab === "linkedin" ? (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-slate-400">{isRtl ? "پست آماده انتشار لینکدین:" : "Ready LinkedIn Post:"}</span>
+                          <button onClick={() => copyToClipboard(result.linkedinPost || "")} className="text-slate-400 hover:text-white transition">
+                            <Clipboard className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed text-justify whitespace-pre-wrap break-words" dir="auto">
+                          {result.linkedinPost || (isRtl ? "پست لینکدین تولید نشد." : "No LinkedIn post generated.")}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-slate-400">{isRtl ? "توضیحات گیت‌هاب (Markdown):" : "GitHub Readme Summary (Markdown):"}</span>
+                          <button onClick={() => copyToClipboard(result.githubSummary || "")} className="text-slate-400 hover:text-white transition">
+                            <Clipboard className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed text-justify whitespace-pre-wrap break-words font-mono" dir="auto">
+                          {result.githubSummary || (isRtl ? "توضیحات گیت‌هاب تولید نشد." : "No GitHub summary generated.")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {result.analysis && (
                   <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
                     <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
                       <span className="text-xs font-bold text-indigo-400 flex items-center gap-1">
-                        <Sparkle className="w-3 h-3" />
+                        <Sparkles className="w-3.5 h-3.5" />
                         {isRtl ? "تحلیل، نقد و راهکارها" : "AI Analysis & Solutions"}
                       </span>
                       <button onClick={() => copyToClipboard(result.analysis || "")} className="text-slate-400 hover:text-white transition">

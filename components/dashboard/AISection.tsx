@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, AlertCircle, Languages, FileText, History, Headphones, Calendar } from "lucide-react";
+import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, AlertCircle, Languages, FileText, History, Headphones, Calendar, Activity, Zap, MessageSquare } from "lucide-react";
 
 interface HistoryItem {
   id: number;
@@ -12,6 +12,10 @@ interface HistoryItem {
   summaryEn?: string;
   linkedinPost?: string;
   githubSummary?: string;
+  fwr?: number;
+  wpm?: number;
+  wpmStatus?: string;
+  lexicalDiversity?: number;
   createdAt: string;
 }
 
@@ -21,7 +25,18 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
   const [analyzeText, setAnalyzeText] = useState(false);
   const [includeSocial, setIncludeSocial] = useState(false);
   const [audioLang, setAudioLang] = useState<"fa" | "en">("fa");
-  const [result, setResult] = useState<{ transcription: string; analysis?: string; summaryFa?: string; summaryEn?: string; linkedinPost?: string; githubSummary?: string } | null>(null);
+  const [result, setResult] = useState<{
+    transcription: string;
+    analysis?: string;
+    summaryFa?: string;
+    summaryEn?: string;
+    linkedinPost?: string;
+    githubSummary?: string;
+    fwr?: number;
+    wpm?: number;
+    wpmStatus?: string;
+    lexicalDiversity?: number;
+  } | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<"process" | "history">("process");
   const [socialTab, setSocialTab] = useState<"linkedin" | "github">("linkedin");
@@ -55,7 +70,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("analyze", analyzeText ? "true" : "false");
+    formData.append("analyze", "true");
     formData.append("includeSocial", includeSocial ? "true" : "false");
     formData.append("language", audioLang);
 
@@ -74,6 +89,10 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
           summaryEn: data.summaryEn,
           linkedinPost: data.linkedinPost,
           githubSummary: data.githubSummary,
+          fwr: data.fwr,
+          wpm: data.wpm,
+          wpmStatus: data.wpmStatus,
+          lexicalDiversity: data.lexicalDiversity,
         });
         fetchHistory();
       } else {
@@ -99,6 +118,10 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
       summaryEn: item.summaryEn,
       linkedinPost: item.linkedinPost,
       githubSummary: item.githubSummary,
+      fwr: item.fwr,
+      wpm: item.wpm,
+      wpmStatus: item.wpmStatus,
+      lexicalDiversity: item.lexicalDiversity,
     });
     setActiveTab("process");
   };
@@ -114,13 +137,13 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
         </div>
         <div>
           <h2 className="text-xl font-black text-white flex items-center justify-center gap-2">
-            {isRtl ? "آتلیه هوش مصنوعی PRM" : "PRM AI Studio"}
+            {isRtl ? "استودیو تحلیل و گفتار هوش مصنوعی PRM" : "PRM AI Speech & Audio Studio"}
             <Sparkles className="w-4 h-4 text-indigo-400" />
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-md">
             {isRtl 
-              ? "فایل صوتی خود را آپلود کنید تا هوش مصنوعی آن را به متن روان تبدیل کرده و تحلیل کند."
-              : "Upload your audio to let AI transcribe and analyze it seamlessly."}
+              ? "فایل صوتی خود را جهت تبدیل دقیق به متن و ارزیابی عمیق فاکتورهای گفتاری آپلود نمایید."
+              : "Upload your audio to get precise transcription and in-depth speech evaluation metrics."}
           </p>
           <div className="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-amber-400/80 bg-amber-500/5 px-3 py-1.5 rounded-full border border-amber-500/10 w-fit mx-auto">
             <AlertCircle className="w-3.5 h-3.5" />
@@ -210,16 +233,6 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
                 <label className="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox" 
-                    checked={analyzeText} 
-                    onChange={(e) => setAnalyzeText(e.target.checked)} 
-                    className="rounded border-slate-800 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
-                  />
-                  {isRtl ? "تحلیل متن با هوش مصنوعی Llama 3.3" : "Analyze with Llama 3.3"}
-                </label>
-
-                <label className="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
                     checked={includeSocial} 
                     onChange={(e) => setIncludeSocial(e.target.checked)} 
                     className="rounded border-slate-800 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
@@ -243,13 +256,61 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
               ) : (
                 <Wand2 className="w-4 h-4" />
               )}
-              <span>{loading ? (isRtl ? "در حال پردازش..." : "Processing...") : (isRtl ? "پردازش صوتی" : "Process Audio")}</span>
+              <span>{loading ? (isRtl ? "در حال پردازش گفتار..." : "Analyzing Speech...") : (isRtl ? "تحلیل و پردازش صوتی" : "Process Audio")}</span>
             </button>
           </div>
 
           <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-1">
             {result ? (
               <div className="flex flex-col gap-4">
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-white/5 flex flex-col gap-1.5 shadow-sm text-center">
+                    <div className="mx-auto p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 w-fit">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {isRtl ? "کلمات پرکننده" : "Filler Words"}
+                    </span>
+                    <span className="text-xs font-black text-indigo-300">
+                      {result.fwr !== undefined ? `${result.fwr}%` : "—"}
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-white/5 flex flex-col gap-1.5 shadow-sm text-center">
+                    <div className="mx-auto p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 w-fit">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {isRtl ? "سرعت گفتار" : "Speech Pace"}
+                    </span>
+                    <span className="text-xs font-black text-cyan-300 flex flex-col">
+                      <span>{result.wpm !== undefined ? `${result.wpm} WPM` : "—"}</span>
+                      {result.wpmStatus && (
+                        <span className={`text-[8px] font-bold mt-0.5 px-1.5 py-0.5 rounded-full inline-block mx-auto ${
+                          result.wpmStatus === "مناسب" 
+                            ? "bg-emerald-500/10 text-emerald-400" 
+                            : "bg-rose-500/10 text-rose-400"
+                        }`}>
+                          {result.wpmStatus}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-white/5 flex flex-col gap-1.5 shadow-sm text-center">
+                    <div className="mx-auto p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 w-fit">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {isRtl ? "تنوع دایره واژگان" : "Lexical Diversity"}
+                    </span>
+                    <span className="text-xs font-black text-emerald-300">
+                      {result.lexicalDiversity !== undefined ? `${result.lexicalDiversity}%` : "—"}
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
                   <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
                     <span className="text-xs font-bold text-cyan-400">{isRtl ? "متن اصلاح‌شده و روان" : "Corrected Transcription"}</span>

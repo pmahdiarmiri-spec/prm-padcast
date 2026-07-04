@@ -5,6 +5,53 @@ const prisma = new PrismaClient();
 
 export const maxDuration = 60;
 
+function calculateSpeechMetrics(text: string, fileSizeInBytes: number) {
+  if (!text) return { fwr: 0, wpm: 0, wpmStatus: "نامشخص", lexicalDiversity: 0 };
+
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  const totalWords = words.length;
+  if (totalWords === 0) return { fwr: 0, wpm: 0, wpmStatus: "نامشخص", lexicalDiversity: 0 };
+
+  const fillerWords = [
+    "مثلا", "مثلاً", "درواقع", "در واقع", "امم", "اوم", "عملا", "عملاً", "به اصطلاح", "یعنی", 
+    "خب", "حالا", "ببین", "ببینید", "راستش", "چیز", "چیزه", "اصطلاحا", "اصطلاحاً", "آقا"
+  ];
+  
+  let fillerCount = 0;
+
+  const cleanWords = words.map(word => {
+    return word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()؟?«»"']/g, "").trim();
+  }).filter(w => w.length > 0);
+
+  cleanWords.forEach(word => {
+    if (fillerWords.includes(word)) {
+      fillerCount++;
+    }
+  });
+
+  const fwr = parseFloat(((fillerCount / totalWords) * 100).toFixed(1));
+
+  let durationInSeconds = fileSizeInBytes / (16000 * 2); 
+  if (durationInSeconds < 5 || durationInSeconds > 7200) {
+    durationInSeconds = totalWords / (145 / 60);
+  }
+  
+  const durationInMinutes = durationInSeconds / 60;
+  const wpm = parseFloat((totalWords / durationInMinutes).toFixed(1));
+
+  let wpmStatus = "مناسب";
+  if (wpm < 110) {
+    wpmStatus = "کند";
+  } else if (wpm > 165) {
+    wpmStatus = "تند";
+  }
+
+  const uniqueWords = new Set(cleanWords.map(w => w.toLowerCase()));
+  const lexicalDiversity = parseFloat(((uniqueWords.size / totalWords) * 100).toFixed(1));
+
+  return { fwr, wpm, wpmStatus, lexicalDiversity };
+}
+
 export async function GET() {
   try {
     const history = await prisma.aiHistory.findMany({
@@ -80,7 +127,7 @@ export async function POST(request: Request) {
             messages: [
               {
                 role: "system",
-                content: "You are an expert Persian editor. Your job is to correct transcription errors. Rewrite the text into highly fluent, readable, and grammatically correct Persian. Only output the corrected text and nothing else."
+                content: "You are an expert Persian editor. Your job is to correct transcription errors. Rewrite the text into highly fluent, readable, and grammatically correct Persian. Only output the corrected text and nothing else. NEVER use Chinese, East Asian characters, or English words in the Persian output."
               },
               {
                 role: "user",
@@ -102,11 +149,13 @@ export async function POST(request: Request) {
       }
     }
 
+    const metrics = calculateSpeechMetrics(finalTranscription, file.size);
+
     if (finalTranscription) {
       try {
         const systemPrompt = includeSocial
-          ? "You are an expert copywriter. Provide four key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). Section 3: An engaging LinkedIn post layout with hashtags based on the content (LinkedIn Post). Section 4: A technical repository readme summary suitable for GitHub in markdown format (GitHub Summary). You MUST use the exact tags <persian></persian>, <english></english>, <linkedin></linkedin>, and <github></github> in your response to enclose each corresponding section. Do not combine, skip or alter these tags."
-          : "You are an expert copywriter. Provide two key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). You MUST use the exact tags <persian></persian> and <english></english> in your response to enclose each corresponding section. Do not combine, skip or alter these tags.";
+          ? "You are an expert copywriter. Provide four key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). Section 3: An engaging LinkedIn post layout with hashtags based on the content (LinkedIn Post). Section 4: A technical repository readme summary suitable for GitHub in markdown format (GitHub Summary). You MUST use the exact tags <persian></persian>, <english></english>, <linkedin></linkedin>, and <github></github> in your response to enclose each corresponding section. Do not combine, skip or alter these tags. Ensure absolutely NO Chinese or non-Persian characters slip into Persian blocks."
+          : "You are an expert copywriter. Provide two key output sections. Section 1: A brief, engaging podcast description in fluent Persian (خلاصه فارسی). Section 2: A translation and summary in English (English Summary). You MUST use the exact tags <persian></persian> and <english></english> in your response to enclose each corresponding section. Do not combine, skip or alter these tags. Ensure absolutely NO Chinese or non-Persian characters slip into Persian blocks.";
 
         const summaryResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
@@ -172,11 +221,11 @@ export async function POST(request: Request) {
             messages: [
               {
                 role: "system",
-                content: "You are an advanced podcast analyzer and speech mentor. Analyze the Persian transcript provided. You MUST talk directly to the user (the speaker) using 'you' (شما/لحن دوم شخص) instead of talking about them as a third person. Do not use words like 'گوینده' or 'او'. Instead, use direct phrases like 'شما در این پادکست...', 'نقاط قوت شما...', 'لحن شما...'. Never use foreign words like 'facile', 'difficile', or 'tham gia'. Translate everything into pure, fluent, professional Persian. Your analysis must contain: 1) Executive Summary (خلاصه مدیریتی), 2) Key Points (نکات کلیدی), 3) Pros & Strengths (نقاط قوت), 4) Cons & Speech Errors (نقاط ضعف و اشکالات گفتاری), and 5) Actionable Solutions & Recommendations (راهکارها و توصیه‌های عملیاتی). Format your output with clear headings, bullet points, and a professional, constructive Persian tone."
+                content: `You are an advanced podcast analyzer and speech mentor. Analyze the Persian transcript. Speak directly using 'you'. Use the calculated metrics to provide direct, specific advice: Filler Word Ratio is ${metrics.fwr}%, Speech Pace is ${metrics.wpm} WPM (${metrics.wpmStatus === "مناسب" ? "Good pace" : metrics.wpmStatus === "تند" ? "Too Fast" : "Too Slow"}), Lexical Diversity is ${metrics.lexicalDiversity}%. Talk to the speaker in 2nd person (شما). Your analysis must contain: 1) Executive Summary (خلاصه مدیریتی), 2) Key Points (نکات کلیدی), 3) Pros & Strengths (نقاط قوت), 4) Cons & Speech Errors (نقاط ضعف و اشکالات گفتاری), and 5) Actionable Solutions & Recommendations (راهکارها و توصیه‌های عملیاتی). CRITICAL CONSTRAINT: Write fully in Persian language. DO NOT use Chinese (Hanzi/Kanji) characters such as 練, 習 under any circumstances. Replace any East Asian glyphs with their standard Persian translations (e.g., use 'تمرین' instead of '練習').`
               },
               {
                 role: "user",
-                content: `لطفاً متن پادکست من را به دقت تحلیل کن و با جزئیات کامل، نقاط قوت، نقاط ضعف، نکات کلیدی و راهکارهای اصلاحی را با لحن مستقیم خطاب به من (شما) به زبان فارسی روان ارائه بده:\n\n${finalTranscription}`
+                content: `لطفاً متن پادکست من را تحلیل کن:\n\n${finalTranscription}`
               }
             ],
             temperature: 0.5,
@@ -202,6 +251,10 @@ export async function POST(request: Request) {
         summaryEn: summaryEn || null,
         linkedinPost: linkedinPost || null,
         githubSummary: githubSummary || null,
+        fwr: metrics.fwr,
+        wpm: metrics.wpm,
+        wpmStatus: metrics.wpmStatus,
+        lexicalDiversity: metrics.lexicalDiversity,
       }
     });
 
@@ -213,6 +266,10 @@ export async function POST(request: Request) {
       summaryEn,
       linkedinPost,
       githubSummary,
+      fwr: metrics.fwr,
+      wpm: metrics.wpm,
+      wpmStatus: metrics.wpmStatus,
+      lexicalDiversity: metrics.lexicalDiversity,
       recordId: savedRecord.id
     });
 

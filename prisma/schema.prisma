@@ -67,14 +67,18 @@ model Report {
 }
 
 model AiHistory {
-  id            Int      @id @default(autoincrement())
-  fileName      String
-  audioUrl      String?
-  transcription String
-  analysis      String?
-  summaryFa     String?
-  summaryEn     String?
-  linkedinPost  String?
-  githubSummary String?
-  createdAt     DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  fileName         String
+  audioUrl         String?
+  transcription    String
+  analysis         String?
+  summaryFa        String?
+  summaryEn        String?
+  linkedinPost     String?
+  githubSummary    String?
+  fwr              Float?
+  wpm              Float?
+  wpmStatus        String?
+  lexicalDiversity Float?
+  createdAt        DateTime @default(now())
 }

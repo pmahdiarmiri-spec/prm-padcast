@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Save, UserCircle } from "lucide-react";
-import { useNotification } from "@/components/NotificationProvider";
+import ProfileSettings from "./ProfileSettings";
+import PlansSection from "./PlansSection";
+import { User, CreditCard } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ProfileSectionProps {
   user: any;
@@ -15,107 +17,54 @@ export default function ProfileSection({
   isRtl,
   handleLogout,
 }: ProfileSectionProps) {
-  const { showNotification } = useNotification();
-  const [fullName, setFullName] = useState(user?.fullName || "");
-  const [field, setField] = useState(user?.field || "");
-  const [bio, setBio] = useState(user?.bio || "");
-  const [updating, setUpdating] = useState(false);
-
-  const handleUpdateProfile = async () => {
-    if (!fullName.trim() || !field.trim()) {
-      showNotification(isRtl ? "نام و حوزه تخصصی نمی‌توانند خالی باشند." : "Name and Field cannot be empty.", "error");
-      return;
-    }
-
-    setUpdating(true);
-    try {
-      const res = await fetch("/api/dashboard", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.id,
-          fullName,
-          field,
-          bio,
-        }),
-      });
-
-      if (res.ok) {
-        const session = localStorage.getItem("user_session");
-        if (session) {
-          const parsed = JSON.parse(session);
-          localStorage.setItem("user_session", JSON.stringify({ ...parsed, fullName, field, bio }));
-        }
-        showNotification(isRtl ? "پروفایل با موفقیت بروزرسانی شد." : "Profile updated successfully.", "success");
-      } else {
-        const data = await res.json();
-        showNotification(data.error || "Error", "error");
-      }
-    } catch {
-      showNotification(isRtl ? "خطا در برقراری ارتباط با سرور." : "Network error.", "error");
-    } finally {
-      setUpdating(false);
-    }
-  };
+  const [activeSubTab, setActiveSubTab] = useState<"settings" | "plans">("settings");
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="w-full max-w-2xl">
-        <div className="glass-panel rounded-3xl p-8 border border-white/10 flex flex-col gap-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-cyan-500/10 rounded-xl">
-              <UserCircle className="w-6 h-6 text-cyan-400" />
-            </div>
-            <h4 className="text-lg font-black text-white">{isRtl ? "تنظیمات پروفایل کاربری" : "User Profile Settings"}</h4>
-          </div>
-          
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] text-slate-400 font-bold px-1">{isRtl ? "نام و نام خانوادگی" : "Full Name"}</span>
-              <input 
-                type="text" 
-                value={fullName} 
-                onChange={(e) => setFullName(e.target.value)}
-                className="bg-slate-950/60 border border-white/10 rounded-2xl p-4 text-xs text-white outline-none focus:border-cyan-500/50 transition-all" 
+    <div className="flex flex-col gap-8 w-full max-w-full">
+      <div className="flex justify-center w-full">
+        <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 relative z-10 w-fit backdrop-blur-xl">
+          <button
+            onClick={() => setActiveSubTab("settings")}
+            className={`relative px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-2 z-10 ${
+              activeSubTab === "settings" ? "text-cyan-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            {activeSubTab === "settings" && (
+              <motion.div
+                layoutId="activeSubTabBg"
+                className="absolute inset-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
-            </div>
-            
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] text-slate-400 font-bold px-1">{isRtl ? "حوزه تخصصی / فیلد" : "Field"}</span>
-              <input 
-                type="text" 
-                value={field} 
-                onChange={(e) => setField(e.target.value)}
-                className="bg-slate-950/60 border border-white/10 rounded-2xl p-4 text-xs text-white outline-none focus:border-cyan-500/50 transition-all" 
+            )}
+            <User className="w-4 h-4" />
+            <span>{isRtl ? "تنظیمات حساب" : "Account Settings"}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab("plans")}
+            className={`relative px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-2 z-10 ${
+              activeSubTab === "plans" ? "text-cyan-400" : "text-slate-400 hover:text-white"
+            }`}
+          >
+            {activeSubTab === "plans" && (
+              <motion.div
+                layoutId="activeSubTabBg"
+                className="absolute inset-0 bg-cyan-500/10 border border-cyan-500/20 rounded-xl -z-10"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
-            </div>
-            
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] text-slate-400 font-bold px-1">{isRtl ? "بیوگرافی" : "Bio"}</span>
-              <textarea 
-                value={bio} 
-                onChange={(e) => setBio(e.target.value)}
-                className="bg-slate-950/60 border border-white/10 rounded-2xl p-4 text-xs text-white h-32 resize-none outline-none focus:border-cyan-500/50 transition-all" 
-              />
-            </div>
-            
-            <button 
-              onClick={handleUpdateProfile}
-              disabled={updating}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-slate-950 font-black text-sm transition hover:shadow-lg hover:shadow-cyan-500/20 active:scale-[0.98] disabled:opacity-50"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Save className="w-4 h-4" />
-                <span>{updating ? (isRtl ? "در حال بروزرسانی..." : "Updating...") : (isRtl ? "ذخیره تغییرات" : "Save Changes")}</span>
-              </div>
-            </button>
-            
-            <button onClick={handleLogout} className="mt-2 flex items-center justify-center gap-2 text-xs text-rose-500/80 hover:text-rose-400 transition-colors font-bold">
-              <LogOut className="w-4 h-4" />
-              <span>{isRtl ? "خروج از حساب کاربری" : "Log Out"}</span>
-            </button>
-          </div>
+            )}
+            <CreditCard className="w-4 h-4" />
+            <span>{isRtl ? "پلن‌های اشتراک" : "Subscription Plans"}</span>
+          </button>
         </div>
+      </div>
+
+      <div className="w-full transition-all duration-500">
+        {activeSubTab === "settings" ? (
+          <ProfileSettings user={user} isRtl={isRtl} handleLogout={handleLogout} />
+        ) : (
+          <PlansSection isRtl={isRtl} />
+        )}
       </div>
     </div>
   );

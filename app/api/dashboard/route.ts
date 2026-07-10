@@ -14,6 +14,10 @@ export async function GET(request: Request) {
       where: { id: Number(userId) },
     });
 
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     return NextResponse.json(user);
   } catch (error: any) {
     return NextResponse.json({ error: "Fetch Error", details: error.message || String(error) }, { status: 500 });
@@ -23,20 +27,52 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { userId, fullName, field, bio } = body;
+    const { userId, fullName, field, bio, avatarUrl, avatarType, avatarFilter, phone, role, creatorStatus } = body;
 
     if (!userId) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: Number(userId) },
-      data: {
-        fullName,
-        field,
-        bio,
-      },
+    const parsedUserId = Number(userId);
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: parsedUserId },
     });
+
+    let updatedUser;
+
+    if (!userExists) {
+      updatedUser = await prisma.user.create({
+        data: {
+          id: parsedUserId,
+          email: `user_${parsedUserId}@prm.local`,
+          fullName,
+          field,
+          bio: bio || null,
+          avatarUrl: avatarUrl || null,
+          avatarType: avatarType || "procedural",
+          avatarFilter: avatarFilter || "none",
+          phone: phone || null,
+          role: role || "user",
+          creatorStatus: creatorStatus || "none",
+        },
+      });
+    } else {
+      updatedUser = await prisma.user.update({
+        where: { id: parsedUserId },
+        data: {
+          fullName,
+          field,
+          bio,
+          avatarUrl: avatarUrl || null,
+          avatarType: avatarType || "procedural",
+          avatarFilter: avatarFilter || "none",
+          phone: phone || null,
+          role: role !== undefined ? role : undefined,
+          creatorStatus: creatorStatus !== undefined ? creatorStatus : undefined,
+        },
+      });
+    }
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {

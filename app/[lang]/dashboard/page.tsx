@@ -242,7 +242,7 @@ function DashboardContent({ lang }: { lang: "fa" | "en" }) {
       <Header lang={lang} />
 
       <div className="w-full max-w-7xl mx-auto my-6 pb-24 lg:pb-0">
-        <div className="hidden lg:flex justify-end gap-2 bg-slate-900/40 p-1.5 rounded-2xl border border-white/5 w-fit mb-8 self-end">
+        <div className="hidden lg:flex justify-center mx-auto gap-2 bg-slate-900/40 p-1.5 rounded-2xl border border-white/5 w-fit mb-8">
           <button onClick={() => setActiveTab("overview")} className={`px-5 py-2.5 text-xs font-bold rounded-xl transition ${activeTab === "overview" ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"}`}>
             {isRtl ? "نمای کلی" : "Overview"}
           </button>

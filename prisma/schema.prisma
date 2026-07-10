@@ -8,14 +8,24 @@ generator client {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  fullName  String
-  field     String
-  bio       String?
-  createdAt DateTime  @default(now())
-  episodes  Episode[]
-  seasons   Season[]
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  fullName         String
+  field            String
+  bio              String?
+  avatarUrl        String?
+  avatarType       String    @default("procedural")
+  avatarFilter     String    @default("none")
+  createdAt        DateTime  @default(now())
+  role             String    @default("user") // "user" | "creator"
+  creatorStatus    String    @default("none") // "none" | "pending" | "rejected" | "approved"
+  auditionCount    Int       @default(0)
+  auditionAudioUrl String?
+  auditionFeedback String?
+  auditionScore    Int       @default(0)
+  phone            String?   @unique
+  episodes         Episode[]
+  seasons          Season[]
 }
 
 model Season {
@@ -33,24 +43,29 @@ model Season {
 }
 
 model Episode {
-  id          Int      @id @default(autoincrement())
-  titleFa     String
-  titleEn     String
-  descFa      String
-  descEn      String
-  audioUrl    String
-  coverUrl    String
-  duration    String
-  episodeNum  String
-  status      String   @default("published")
-  transcript  String?
-  aiAnalysis  String?
-  createdAt   DateTime @default(now())
-  userId      Int?
-  user        User?    @relation(fields: [userId], references: [id])
-  seasonId    Int?
-  season      Season?  @relation(fields: [seasonId], references: [id])
-  reports     Report[]
+  id               Int      @id @default(autoincrement())
+  titleFa          String
+  titleEn          String
+  descFa           String
+  descEn           String
+  audioUrl         String
+  coverUrl         String
+  duration         String
+  episodeNum       String
+  status           String   @default("draft")
+  score            Int      @default(0)
+  fwr              Float    @default(0)
+  wpm              Float    @default(0)
+  lexicalDiversity Float    @default(0)
+  rejectionReason  String?
+  transcript       String?
+  aiAnalysis       String?
+  createdAt        DateTime @default(now())
+  userId           Int?
+  user             User?    @relation(fields: [userId], references: [id])
+  seasonId         Int?
+  season           Season?  @relation(fields: [seasonId], references: [id])
+  reports          Report[]
 
   @@unique([seasonId, episodeNum])
 }
@@ -76,6 +91,7 @@ model AiHistory {
   summaryEn        String?
   linkedinPost     String?
   githubSummary    String?
+  chapters         String?
   fwr              Float?
   wpm              Float?
   wpmStatus        String?

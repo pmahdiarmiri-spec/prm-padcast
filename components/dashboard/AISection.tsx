@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, AlertCircle, Languages, FileText, History, Headphones, Calendar, Activity, Zap, MessageSquare } from "lucide-react";
+import { Brain, Sparkles, Wand2, FileAudio, Loader2, Clipboard, AlertCircle, Languages, FileText, History, Headphones, Calendar, Activity, Zap, MessageSquare, Clock } from "lucide-react";
 
 interface HistoryItem {
   id: number;
@@ -12,6 +12,7 @@ interface HistoryItem {
   summaryEn?: string;
   linkedinPost?: string;
   githubSummary?: string;
+  chapters?: string;
   fwr?: number;
   wpm?: number;
   wpmStatus?: string;
@@ -22,7 +23,6 @@ interface HistoryItem {
 export default function AISection({ isRtl }: { isRtl: boolean }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [analyzeText, setAnalyzeText] = useState(false);
   const [includeSocial, setIncludeSocial] = useState(false);
   const [audioLang, setAudioLang] = useState<"fa" | "en">("fa");
   const [result, setResult] = useState<{
@@ -32,6 +32,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
     summaryEn?: string;
     linkedinPost?: string;
     githubSummary?: string;
+    chapters?: string;
     fwr?: number;
     wpm?: number;
     wpmStatus?: string;
@@ -40,6 +41,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [activeTab, setActiveTab] = useState<"process" | "history">("process");
   const [socialTab, setSocialTab] = useState<"linkedin" | "github">("linkedin");
+  const [outputTab, setOutputTab] = useState<"analysis" | "chapters">("chapters");
 
   useEffect(() => {
     fetchHistory();
@@ -89,6 +91,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
           summaryEn: data.summaryEn,
           linkedinPost: data.linkedinPost,
           githubSummary: data.githubSummary,
+          chapters: data.chapters,
           fwr: data.fwr,
           wpm: data.wpm,
           wpmStatus: data.wpmStatus,
@@ -118,6 +121,7 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
       summaryEn: item.summaryEn,
       linkedinPost: item.linkedinPost,
       githubSummary: item.githubSummary,
+      chapters: item.chapters,
       fwr: item.fwr,
       wpm: item.wpm,
       wpmStatus: item.wpmStatus,
@@ -349,6 +353,69 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
                   </div>
                 </div>
 
+                <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
+                  <div className="flex justify-center gap-2 border-b border-white/5 pb-2 mb-4">
+                    <button
+                      onClick={() => setOutputTab("chapters")}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5 ${
+                        outputTab === "chapters"
+                          ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      {isRtl ? "بخش‌بندی زمانی (Chapters)" : "Interactive Chapters"}
+                    </button>
+                    <button
+                      onClick={() => setOutputTab("analysis")}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5 ${
+                        outputTab === "analysis"
+                          ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      {isRtl ? "کیت تحلیل و راهکارها" : "AI Speech Mentor"}
+                    </button>
+                  </div>
+
+                  {outputTab === "chapters" ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-400">{isRtl ? "تایم‌استمپ استاندارد (یوتیوب/اسپاتیفای):" : "Standard Chapter Timestamps:"}</span>
+                        <button onClick={() => copyToClipboard(result.chapters || "")} className="text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px] bg-slate-900 border border-white/5 px-2 py-1 rounded-md">
+                          <Clipboard className="w-3 h-3" />
+                          {isRtl ? "کپی کل فصل‌ها" : "Copy Chapters"}
+                        </button>
+                      </div>
+                      <div className="text-[11px] text-slate-300 leading-relaxed font-mono whitespace-pre-wrap break-words bg-slate-950/60 p-3 rounded-xl border border-white/5" dir="auto">
+                        {result.chapters ? (
+                          result.chapters.split("\n").map((line, idx) => (
+                            <div key={idx} className="py-1 hover:bg-white/5 rounded px-2 transition flex items-center gap-2">
+                              <span className="text-cyan-400 font-bold">{line.match(/\[\d{2}:\d{2}\]/)?.[0] || ""}</span>
+                              <span>{line.replace(/\[\d{2}:\d{2}\]/, "").trim()}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <span className="text-slate-500">{isRtl ? "بخش‌بندی زمانی یافت نشد." : "No chapters generated."}</span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-400">{isRtl ? "تحلیل، نقد و راهکارها:" : "AI Analysis & Speech Mentorship:"}</span>
+                        <button onClick={() => copyToClipboard(result.analysis || "")} className="text-slate-400 hover:text-white transition">
+                          <Clipboard className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed text-justify whitespace-pre-wrap break-words" dir="auto">
+                        {result.analysis || (isRtl ? "تحلیلی یافت نشد." : "No analysis generated.")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {(result.linkedinPost || result.githubSummary) && (
                   <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
                     <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
@@ -403,23 +470,6 @@ export default function AISection({ isRtl }: { isRtl: boolean }) {
                         </p>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {result.analysis && (
-                  <div className="flex flex-col bg-slate-950/80 p-5 rounded-2xl border border-white/10 shadow-inner">
-                    <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
-                      <span className="text-xs font-bold text-indigo-400 flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        {isRtl ? "تحلیل، نقد و راهکارها" : "AI Analysis & Solutions"}
-                      </span>
-                      <button onClick={() => copyToClipboard(result.analysis || "")} className="text-slate-400 hover:text-white transition">
-                        <Clipboard className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="text-xs text-slate-200 leading-relaxed text-justify whitespace-pre-wrap break-words" dir="auto">
-                      {result.analysis}
-                    </p>
                   </div>
                 )}
               </div>

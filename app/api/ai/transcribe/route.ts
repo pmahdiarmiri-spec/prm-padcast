@@ -84,6 +84,7 @@ export async function POST(request: Request) {
     externalFormData.append("model", "whisper-large-v3-turbo");
     externalFormData.append("language", language);
     externalFormData.append("temperature", "0.2");
+    externalFormData.append("response_format", "verbose_json");
     externalFormData.append("prompt", "برنامه‌نویسی، پایتون، وی‌اس کد، VS Code، آقای میری، توست‌مسترز، ICDL، هزار تومن، ضبط پادکست، کد زدن.");
 
     let whisperResponse;
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
 
     const whisperData = (await whisperResponse.json()) as any;
     const rawTranscription = whisperData.text || "";
+    const segments = whisperData.segments || [];
 
     let finalTranscription = rawTranscription;
     let analysisText = "";
@@ -113,6 +115,7 @@ export async function POST(request: Request) {
     let summaryEn = "";
     let linkedinPost = "";
     let githubSummary = "";
+    let chaptersText = "";
 
     if (rawTranscription) {
       try {
@@ -150,6 +153,45 @@ export async function POST(request: Request) {
     }
 
     const metrics = calculateSpeechMetrics(finalTranscription, file.size);
+
+    if (finalTranscription && segments.length > 0) {
+      try {
+        const segmentSummary = segments.map((s: any) => {
+          const startMin = Math.floor(s.start / 60).toString().padStart(2, "0");
+          const startSec = Math.floor(s.start % 60).toString().padStart(2, "0");
+          return `[${startMin}:${startSec}] ${s.text}`;
+        }).join("\n");
+
+        const chaptersResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              {
+                role: "system",
+                content: "You are an expert podcast editor. Analyze the timestamped segments and generate structured podcast chapters. Group adjacent segments into cohesive topics. Format each chapter strictly as '[MM:SS] Title of the chapter in fluent Persian'. Do not output any preamble, extra text, or system notes. Output ONLY the list of chapters."
+              },
+              {
+                role: "user",
+                content: `Based on this timeline, extract 4-8 logical chapters with appropriate timestamps:\n\n${segmentSummary}`
+              }
+            ],
+            temperature: 0.3,
+          }),
+        });
+
+        if (chaptersResponse.ok) {
+          const chaptersData = await chaptersResponse.json();
+          chaptersText = chaptersData.choices?.[0]?.message?.content || "";
+        }
+      } catch (err) {
+        console.error("Failed to generate chapters: ", err);
+      }
+    }
 
     if (finalTranscription) {
       try {
@@ -251,6 +293,7 @@ export async function POST(request: Request) {
         summaryEn: summaryEn || null,
         linkedinPost: linkedinPost || null,
         githubSummary: githubSummary || null,
+        chapters: chaptersText || null,
         fwr: metrics.fwr,
         wpm: metrics.wpm,
         wpmStatus: metrics.wpmStatus,
@@ -266,6 +309,7 @@ export async function POST(request: Request) {
       summaryEn,
       linkedinPost,
       githubSummary,
+      chapters: chaptersText,
       fwr: metrics.fwr,
       wpm: metrics.wpm,
       wpmStatus: metrics.wpmStatus,
